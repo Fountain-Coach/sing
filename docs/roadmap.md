@@ -23,6 +23,7 @@
 ## S2 — native independent singer (pending)
 
 - [ ] Build a small consented phoneme corpus and legally admitted rights receipts.
+- [ ] Implement a second independent **procedural resonator** path, informed by PPG Phonem's 12-resonator/excitation/phoneme approach, not its proprietary internals. Test a vowel with independent pitch and formant movement and consonant-to-vowel transitions.
 - [ ] Reuse only actual exported `midi2sampler` code; add proper sample reader, buffer lifecycle and voice state.
 - [ ] Sustain vowel over variable pitch without unwanted formant shifts; consonant noise, airflow and release with click-free transitions.
 - [ ] Implement melisma, legato, silence/rest, repeated syllable with explicit advancement rules.
