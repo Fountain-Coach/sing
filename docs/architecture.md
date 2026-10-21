@@ -57,7 +57,7 @@ No allocations/locks/file I/O in the native render callback, bounded scheduling 
 
 **Alter/Ego compatibility:** use the vendor Audio Unit as an unmodified black-box interpreter of derived ARIA state and MIDI, with licensed voice. An adapter must record state hash, preset identity, audio capture and MIDI route. Alter/Ego compatibility does not grant voice-bank redistribution or proprietary implementation rights.
 
-**Native sing voice:** owns phonetic timeline and DSP without depending on Alter/Ego formats. Reuse midi2sampler's actual included primitives, then fill missing sampler, pitch/formant, noise and real-time rendering pieces. Do not mistake its README's excluded corpus/validation/resampling features for exported package products.
+**Native sing voice:** owns phonetic timeline and DSP without depending on Alter/Ego or Phonem formats. Two complementary native models share one score: (1) a consented recorded-phoneme sampler/resynthesis voice, retaining pitch/formant independence; (2) a procedural phonetic synthesizer with controllable excitation/noise, resonator/formant centers and bandwidths, and transitions informed by Wolfgang Palm's PPG Phonem workflow. The latter can produce original synthetic singing without sampling an identifiable singer. Reuse midi2sampler's actual included primitives where applicable, then implement missing sampler, resonator, excitation, pitch and real-time rendering pieces. Do not mistake its README's excluded corpus/validation/resampling features for exported package products. See [Phonem reference](phonem-reference.md).
 
 **Csound and others:** optional score/render implementations after linkage and output are witnessed; Teatro's local Csound C target currently contains a non-audible dummy/stub.
 
