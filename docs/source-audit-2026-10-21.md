@@ -1,5 +1,5 @@
 # Source audit — Fountain Coach and Contexter
-**21 October 2026. Evidence: repository tree, manifest, and targeted file inspection on each indicated GitHub default branch.** This is a selective audio/phonetic/MIDI audit, **not** an exhaustive functional audit or installed-binary verification.
+**21 October 2026. Evidence: repository tree, manifest, and targeted file inspection on each indicated GitHub default branch.** This is a selective audio/phonetic/MIDI audit, **not** an exhaustive functional audit or installed-binary verification. Head commit SHAs and immutable Git URLs are recorded in [the source pin manifest](audit-pins-2026-10-21.json); the links below are readable repository entry points, not revision locks.
 
 ## Primary reusable implementations
 
