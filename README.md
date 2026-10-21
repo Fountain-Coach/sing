@@ -4,7 +4,7 @@
 
 **Status: architecture and source audit, 21 October 2026. No native singing render is claimed.**
 
-A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Its reference is Plogue Alter/Ego's playable lyric-and-MIDI workflow—not a fork or claim about its proprietary internals.
+A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Its reference lineages include Plogue Alter/Ego's playable lyric-and-MIDI workflow **and Wolfgang Palm's PPG Phonem for iPad**, with its controllable 12-resonator vocal synthesis. Neither proprietary implementation is part of this source.
 
 ## Position in the estate
 
@@ -19,7 +19,7 @@ A voice is an instrument, a syllable is a timed phonetic state, and a performanc
 
 A source passage and its hash are not a voice bank. A voice bank and its licence are not a score. An executable score and its renderer are not a published First Hearing. Keeping these separate lets one score be performed by Alter/Ego, a native sample/formant singer, a consented human voice, or an explicitly qualified future neural model.
 
-**7VST / Seven Against Thebes** is the documented historical specimen: a 2017 Alter/Ego/Bidule/ARIA experiment and privately restored audio/text evidence. New renditions are **new editions**, never silently labelled as the historical production. See [7VST lineage](docs/7vst-case-study.md).
+**7VST / Seven Against Thebes** is the documented historical specimen: a 2017 Alter/Ego/Bidule/ARIA experiment and privately restored audio/text evidence. The author also reports extensive use of **PPG Phonem for iPad** in the historical Bandcamp work; particular track assignments have not yet been independently established. New renditions are **new editions**, never silently labelled as the historical production. See [7VST lineage](docs/7vst-case-study.md).
 
 **Satzfunk offspring** may be independently versioned voices, choirs, pronunciation models, scores, or small autonomous performance agents with explicit parentage, controlled execution, provenance and rights. “Babies” means independent artistic instruments, not unbounded code replication. See [offspring contract](docs/offspring.md).
 
@@ -28,6 +28,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
+- [Wolfgang Palm's PPG Phonem for iPad: resonator voice and historical Bandcamp testimony](docs/phonem-reference.md)
 - [7VST historical source and new score](docs/7vst-case-study.md)
 - [Satzfunk family / offspring](docs/offspring.md)
 - [Executable acceptance scenario and roadmap](docs/roadmap.md)
