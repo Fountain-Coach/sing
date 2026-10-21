@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Fountain-Coach/sing/blob/main/schemas/sing-phrase-v1.schema.json",
+  "title": "sing authored phrase v1",
+  "description": "Authored input contract only: this does not attest to real rendered sound, voice rights, or publication permission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source",
+    "phrase",
+    "performance",
+    "voiceSelection",
+    "renderIntent"
+  ],
+  "properties": {
+    "schema": {
+      "const": "sing.phrase.v1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "kind",
+        "language",
+        "text",
+        "rights"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "synthetic",
+            "licensed",
+            "author-owned",
+            "private-source"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "rights": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "phrase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "syllables"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "syllables": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text",
+              "phonemes",
+              "stress"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "phonemes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "symbol",
+                    "role"
+                  ],
+                  "properties": {
+                    "symbol": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "role": {
+                      "enum": [
+                        "onset",
+                        "nucleus",
+                        "coda"
+                      ]
+                    }
+                  }
+                }
+              },
+              "stress": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timebase",
+        "notes"
+      ],
+      "properties": {
+        "timebase": {
+          "const": "milliseconds"
+        },
+        "notes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "syllableId",
+              "pitch",
+              "onMs",
+              "offMs",
+              "velocity16",
+              "advanceSyllable"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "syllableId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pitch": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 127
+              },
+              "onMs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "offMs": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "velocity16": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535
+              },
+              "advanceSyllable": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "voiceSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unbound",
+            "selected"
+          ]
+        },
+        "voiceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "voiceRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "renderIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "release"
+      ],
+      "properties": {
+        "state": {
+          "const": "not-rendered"
+        },
+        "release": {
+          "const": "not-admitted"
+        },
+        "preferredRenderer": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
