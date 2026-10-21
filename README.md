@@ -26,7 +26,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 ## Documentation and first milestone
 
 - [Architecture and instrument boundaries](docs/architecture.md)
-- [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md)
+- [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
 - [7VST historical source and new score](docs/7vst-case-study.md)
 - [Satzfunk family / offspring](docs/offspring.md)
@@ -35,6 +35,15 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Provisional performance JSON schema](schemas/sing-phrase-v1.schema.json) and [synthetic phrase example](examples/three-syllables.json)
 
 **First acceptance:** one intentionally synthetic three-syllable phrase, three timed MIDI notes, a real renderer, isolated recorded audio, and a verifiable execution receipt. Follow with a multi-note vowel (melisma) and note-off release. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
+
+## Local documentary test
+
+```sh
+python3 -m unittest discover -s tests -v
+python3 tools/check_phrase.py examples/three-syllables.json
+```
+
+The validator checks phrase/note alignment and rejects false rendering or release states. It additionally checks the complete JSON Schema only when the optional `jsonschema` Python package is installed. These tests do **not** synthesize or verify audio. No GitHub CI is configured.
 
 ## Evidence standard
 
