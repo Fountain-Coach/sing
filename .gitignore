@@ -1,0 +1,18 @@
+# Local runtime and build products
+.DS_Store
+__pycache__/
+*.py[cod]
+.build/
+.venv/
+.env
+.env.*
+# Local proprietary or private media/preset caches are never public source
+private/
+vendor/
+voicebanks/
+*.ariax
+*.ariap
+*.aupreset
+*.component
+*.vst
+*.vst3
