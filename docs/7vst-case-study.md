@@ -14,6 +14,12 @@
 
 The restored private [7VST edition](https://github.com/Fountain-Coach/Satzfunk/blob/main/docs/archaeology/2026-10-21-7vst-restored-private-edition.md) joins 18 WAV/MP3/MP4 candidates with their published text entries in an authorized LAN browser; album order is not assumed to be dramaturgical chronology. Rights for the modern English translation, published credits and voice material need explicit review.
 
+## Additional historical instrument: Wolfgang Palm's Phonem for iPad
+
+The author reports **extensive use of PPG Phonem on iPad** and says it can be heard within the historical Unpopular Electronics Bandcamp material. This is important **author testimony**, distinct from the individually decoded Alter/Ego host states. The present archived session evidence does **not** establish which of the eighteen 7VST parts, or which other Bandcamp videos, contain Phonem. Do not present it as exclusive to 7VST or as an authenticated track-by-track attribution.
+
+See [Phonem synthesis and archival evidence note](phonem-reference.md), [the private Satzfunk listening archive](https://github.com/Fountain-Coach/Satzfunk/blob/main/archive/browser/index.html), and [the restored 7VST study browser](https://github.com/Fountain-Coach/Satzfunk/blob/main/archive/browser/7vst-originals.html). A forensic listening review should save candidate track/timecode/edition/source hash before seeking independent iPad, session or stem corroboration.
+
 ## Four editions, not one mutable artifact
 
 1. **Historical original:** unmodified 2017–2018 outputs and original authoring files; retain hashes and provenance, never overwrite.
