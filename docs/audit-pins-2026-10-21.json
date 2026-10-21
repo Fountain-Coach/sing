@@ -1,0 +1,147 @@
+{
+  "schema": "sing.source-audit-pins.v1",
+  "date": "2026-10-21",
+  "meaning": "Repository head commits during a targeted source audit; not proof of compilation, working DSP, consent or release.",
+  "sources": [
+    {
+      "repository": "Fountain-Coach/midi2sampler",
+      "commit": "64aaed8613a1f8eff0fc8bdb76656688848b0f87",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/midi2sampler/tree/64aaed8613a1f8eff0fc8bdb76656688848b0f87"
+    },
+    {
+      "repository": "Fountain-Coach/midi2",
+      "commit": "b596c7e8b2f1b1fd12b430b72cb79dae54c23a8a",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/midi2/tree/b596c7e8b2f1b1fd12b430b72cb79dae54c23a8a"
+    },
+    {
+      "repository": "Fountain-Coach/ScoreKit",
+      "commit": "dec10233299022d840db7216b3f72bc136e176b3",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/ScoreKit/tree/dec10233299022d840db7216b3f72bc136e176b3"
+    },
+    {
+      "repository": "Fountain-Coach/AudioTalk",
+      "commit": "e73a2457bf0c27764e064a141ce1465f97fddddb",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/AudioTalk/tree/e73a2457bf0c27764e064a141ce1465f97fddddb"
+    },
+    {
+      "repository": "Fountain-Coach/Teatro",
+      "commit": "2da76dc54ae6328bffe64087888c9f0de3c9edff",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/Teatro/tree/2da76dc54ae6328bffe64087888c9f0de3c9edff"
+    },
+    {
+      "repository": "Fountain-Coach/swift-csound",
+      "commit": "324d9ed6055c4fa4893fc79c454f939b98dd8fa6",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/swift-csound/tree/324d9ed6055c4fa4893fc79c454f939b98dd8fa6"
+    },
+    {
+      "repository": "Fountain-Coach/SDLKit",
+      "commit": "b73137213d2669443d4337287fd9f898f1da885d",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/SDLKit/tree/b73137213d2669443d4337287fd9f898f1da885d"
+    },
+    {
+      "repository": "Fountain-Coach/basic-pitch",
+      "commit": "33e90c6adbf109f5cad4e9900c50eb9d92812ee2",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/basic-pitch/tree/33e90c6adbf109f5cad4e9900c50eb9d92812ee2"
+    },
+    {
+      "repository": "Fountain-Coach/MIDI2InstrumentLab",
+      "commit": "08f9e570886c8cb0bff0f326b8092d65fd423c20",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/MIDI2InstrumentLab/tree/08f9e570886c8cb0bff0f326b8092d65fd423c20"
+    },
+    {
+      "repository": "Fountain-Coach/FountainCoreMIDIBridge",
+      "commit": "c7b0a347341108f984aa96e4dbbb8a041aabbb46",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/FountainCoreMIDIBridge/tree/c7b0a347341108f984aa96e4dbbb8a041aabbb46"
+    },
+    {
+      "repository": "Fountain-Coach/FountainFlow",
+      "commit": "14ab0dedf66d619ff9c24800af59340c2acbfc29",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/FountainFlow/tree/14ab0dedf66d619ff9c24800af59340c2acbfc29"
+    },
+    {
+      "repository": "Fountain-Coach/instruments.fountain.coach",
+      "commit": "34f75755f1d77448926c4b27d4cee964b25df663",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/instruments.fountain.coach/tree/34f75755f1d77448926c4b27d4cee964b25df663"
+    },
+    {
+      "repository": "Fountain-Coach/Satzfunk",
+      "commit": "10574dc11317c777051a4ef25a0fbc374df58d01",
+      "visibility": "private",
+      "permalink": "https://github.com/Fountain-Coach/Satzfunk/tree/10574dc11317c777051a4ef25a0fbc374df58d01"
+    },
+    {
+      "repository": "Fountain-Coach/Reframe",
+      "commit": "f0c6bef6b33dd575767da05d055d69c1b62630b8",
+      "visibility": "private",
+      "permalink": "https://github.com/Fountain-Coach/Reframe/tree/f0c6bef6b33dd575767da05d055d69c1b62630b8"
+    },
+    {
+      "repository": "Fountain-Coach/FountainKit",
+      "commit": "07ea5a820eca3bb30f83250a2d5ba1cd509b15a3",
+      "visibility": "private",
+      "permalink": "https://github.com/Fountain-Coach/FountainKit/tree/07ea5a820eca3bb30f83250a2d5ba1cd509b15a3"
+    },
+    {
+      "repository": "Fountain-Coach/midi-backplane",
+      "commit": "25e5ac3b9169856258ac030ef0ba9131c347defe",
+      "visibility": "private",
+      "permalink": "https://github.com/Fountain-Coach/midi-backplane/tree/25e5ac3b9169856258ac030ef0ba9131c347defe"
+    },
+    {
+      "repository": "Fountain-Coach/midi2-gpu-fabric",
+      "commit": "22f2f4a15c38e54066bc54743d106455ab963986",
+      "visibility": "private",
+      "permalink": "https://github.com/Fountain-Coach/midi2-gpu-fabric/tree/22f2f4a15c38e54066bc54743d106455ab963986"
+    },
+    {
+      "repository": "Fountain-Coach/outer-ear",
+      "commit": "35e9dc9084caf57d11c5bdb5007a88e57a79ac90",
+      "visibility": "public",
+      "permalink": "https://github.com/Fountain-Coach/outer-ear/tree/35e9dc9084caf57d11c5bdb5007a88e57a79ac90"
+    },
+    {
+      "repository": "Contexter/Chormusik",
+      "commit": "c877f7ddbcee09785617547857f8801bfdfb63bb",
+      "visibility": "public",
+      "permalink": "https://github.com/Contexter/Chormusik/tree/c877f7ddbcee09785617547857f8801bfdfb63bb"
+    },
+    {
+      "repository": "Contexter/fountain-play",
+      "commit": "9b7d15c605cc240ffc2c301b36f4125d77dfbd16",
+      "visibility": "public",
+      "permalink": "https://github.com/Contexter/fountain-play/tree/9b7d15c605cc240ffc2c301b36f4125d77dfbd16"
+    },
+    {
+      "repository": "Contexter/FountainAI",
+      "commit": "1cce412ec5f331dc498919a783ff30259c9fdef5",
+      "visibility": "public",
+      "permalink": "https://github.com/Contexter/FountainAI/tree/1cce412ec5f331dc498919a783ff30259c9fdef5"
+    },
+    {
+      "repository": "Contexter/TeatroKit",
+      "commit": "a744d115346c6d57db77bdf1601a0a83e837df45",
+      "visibility": "public",
+      "permalink": "https://github.com/Contexter/TeatroKit/tree/a744d115346c6d57db77bdf1601a0a83e837df45"
+    },
+    {
+      "repository": "Contexter/Spoken-Word-Service",
+      "status": "empty-git-repository-http-409"
+    },
+    {
+      "repository": "Contexter/Performer-Service",
+      "status": "empty-git-repository-http-409"
+    }
+  ]
+}
