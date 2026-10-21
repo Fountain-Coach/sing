@@ -1,0 +1,100 @@
+{
+  "schema": "sing.phrase.v1",
+  "source": {
+    "sourceId": "sing.synthetic.la-mi-na.v1",
+    "kind": "synthetic",
+    "language": "en",
+    "text": "la mi na",
+    "rights": "original test phonemes, no historical 7VST material"
+  },
+  "phrase": {
+    "id": "phrase-01",
+    "syllables": [
+      {
+        "id": "s1",
+        "text": "la",
+        "phonemes": [
+          {
+            "symbol": "l",
+            "role": "onset"
+          },
+          {
+            "symbol": "ɑ",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 0
+      },
+      {
+        "id": "s2",
+        "text": "mi",
+        "phonemes": [
+          {
+            "symbol": "m",
+            "role": "onset"
+          },
+          {
+            "symbol": "i",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 1
+      },
+      {
+        "id": "s3",
+        "text": "na",
+        "phonemes": [
+          {
+            "symbol": "n",
+            "role": "onset"
+          },
+          {
+            "symbol": "ɑ",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 0
+      }
+    ]
+  },
+  "performance": {
+    "timebase": "milliseconds",
+    "notes": [
+      {
+        "id": "n1",
+        "syllableId": "s1",
+        "pitch": 62,
+        "onMs": 0,
+        "offMs": 400,
+        "velocity16": 32000,
+        "advanceSyllable": true
+      },
+      {
+        "id": "n2",
+        "syllableId": "s2",
+        "pitch": 65,
+        "onMs": 440,
+        "offMs": 940,
+        "velocity16": 37000,
+        "advanceSyllable": true
+      },
+      {
+        "id": "n3",
+        "syllableId": "s3",
+        "pitch": 64,
+        "onMs": 980,
+        "offMs": 1480,
+        "velocity16": 31000,
+        "advanceSyllable": true
+      }
+    ]
+  },
+  "voiceSelection": {
+    "status": "unbound"
+  },
+  "renderIntent": {
+    "state": "not-rendered",
+    "release": "not-admitted",
+    "preferredRenderer": "licensed-AlterEgo-reference-then-native-sing"
+  }
+}
