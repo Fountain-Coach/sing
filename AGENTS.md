@@ -1,7 +1,7 @@
 # sing — agent and contributor instructions
 
 ## Mission
-Design and verify independently reproducible MIDI 2.0 singing instruments interoperating with Satzfunk/Teatro, with Alter/Ego as an external black-box reference and 7VST as protected historical evidence. Build reusable, self-describing instruments; do not replace the manuscript/editorial workflow.
+Design and verify independently reproducible MIDI 2.0 singing instruments interoperating with Satzfunk/Teatro. Implement our own native vocal synthesis first; neither Marie Ork nor Alter/Ego is on the critical path. Treat old vendor experiments and 7VST as protected historical research only. Build reusable, self-describing instruments; do not replace the manuscript/editorial workflow.
 
 ## Authority
 - **sing:** phoneme alignment, vowel sustains, consonant transitions, melisma, voice capabilities, acoustic controls, renderer contracts, tests and evidence receipts.
@@ -25,7 +25,7 @@ Design and verify independently reproducible MIDI 2.0 singing instruments intero
 10. Never rewrite another repository automatically. Cross-repository changes require their owning contracts and corresponding tests.
 
 ## First scenario
-Validate `examples/three-syllables.json` against its schema; then implement a local renderer adapter and a witnessed audio capture. Do not mark it accepted merely because JSON or MIDI messages can be generated.
+Start from `Package.swift` and the self-contained native Swift `SingVoice` synthesizer. Run `swift test` and both Python authored-phrase checks; make isolated native WAV audition with `swift run -c release sing-render examples/three-syllables.json /tmp/sing-la-mi-na.wav`. The no-note control must be silent. Native output is measured PCM only until the author hears intelligible phonemes. Then connect the existing midi2 packet stack, without creating a second transport plane. Never use the historical licensed voice as a required test.
 
 ## Working style
 Contributors must report: inspected refs, implementation change, exact local test command/result, audio witness when applicable, uncertainties, and downstream impact.

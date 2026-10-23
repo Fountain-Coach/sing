@@ -1,6 +1,6 @@
 # Scenarios and acceptance — sing
 
-**Development status as of 2026-10-21:** conceptual contract and static source audit; no new singing audio from sing. Existing Alter/Ego Marie Ork MIDI-triggered system-mix sound is separately witnessed in [Satzfunk](https://github.com/Fountain-Coach/Satzfunk).
+**Development status, 2026-10-23:** our own Swift procedural-formant offline engine now builds and emits reproducible PCM WAV from the original synthetic fixture. Both Linux and macOS compile/tests passed. Intelligible singing, physical MIDI 2.0 routing, real-time audio and publication are **not** yet demonstrated. Marie Ork / Alter-Ego are removed from the active implementation path. See [native voice-first decision](native-stack-decision-2026-10-23.md).
 
 ## S0 — source and capability inventory (done, documentary only)
 
@@ -9,25 +9,27 @@
 - [x] Identify known missing midi2sampler build exports, note-scheduling and renderer gaps.
 - [ ] Test actual compiled target exports and local integration graph independently.
 
-## S1 — first *real* singing sound (pending)
+## S1 — native first sound (PCM generated; intelligible singing pending)
 
-**Fixture:** `examples/three-syllables.json`, synthetic `la mi na` with three timed notes and explicit phoneme/vowel mapping.
+**Fixture:** `examples/three-syllables.json`, original synthetic `la mi na` with three notes and timed consonant/vowel pairs. No proprietary samples, plugin state or vendor voicebank.
 
-- [ ] Validate authored schema, store input hash, verify text/phoneme/note ID integrity.
-- [ ] Produce a private Alter/Ego ARIA state with the existing hash-bound Satzfunk tool from a licensed Marie Ork state.
-- [ ] Load derived state into actual vendor Audio Unit and establish explicit phrase cursor/reset.
-- [ ] Send note on/off via typed MIDI2 local route, with logged MIDI1 adapter limits where necessary.
-- [ ] Capture *isolated* rendered audio; test no-note silence, repeated rendering and real sound output. Save WAV format, cryptographic digests and timing/audio-quality witness.
-- [ ] Have the author identify intelligible `la mi na`, not just non-silent sound.
+- [x] Compile native Swift package, validate supported phonemes and phrase/note identity, render a three-note synthetic vowel sequence to isolated WAV output.
+- [x] Test repeatability, measured sound, valid WAV, unknown phoneme rejection and no-note silence. Five Swift tests passed on macOS and Linux, separately from existing five Python authored-phrase tests.
+- [x] Produce 48 kHz mono 16-bit PCM WAV with recorded duration, level and SHA-256 digest (test fixture; no human audibility judgement).
+- [ ] Have the author identify intelligible `la mi na` by listening to native output; redesign formant and consonant transitions as required.
+- [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
+- [ ] Receive note on/off and per-note expression via the **existing** typed MIDI 2.0 route; current JSON-to-PCM renderer is offline, not a live MIDI instrument.
+- [ ] Implement melisma, phrase reset, legato, silence/rest, real-time callback and device output without untested promises.
 
 ## S2 — native independent singer (pending)
 
 - [ ] Build a small consented phoneme corpus and legally admitted rights receipts.
-- [ ] Implement a second independent **procedural resonator** path, informed by PPG Phonem's 12-resonator/excitation/phoneme approach, not its proprietary internals. Test a vowel with independent pitch and formant movement and consonant-to-vowel transitions.
+- [x] Implement our **first independent procedural resonator prototype** with original excitation, per-phoneme formant banks and timed consonant-to-vowel crossfades; it currently covers only the original la/mi/na test phonemes, without proven naturalness.
+- [ ] Extend the prototype with independent continuous pitch/formant movement, tested vocal tract resonance and consonant transitions.
 - [ ] Reuse only actual exported `midi2sampler` code; add proper sample reader, buffer lifecycle and voice state.
 - [ ] Sustain vowel over variable pitch without unwanted formant shifts; consonant noise, airflow and release with click-free transitions.
 - [ ] Implement melisma, legato, silence/rest, repeated syllable with explicit advancement rules.
-- [ ] Compare output with Alter/Ego behavioral reference, not claim identical timbre.
+- [ ] Compare native auditions with author-selected acoustic/perceptual reference criteria; vendor fidelity and Marie Ork compatibility are **not** acceptance requirements.
 
 ## S3 — composer and Satzfunk (pending)
 

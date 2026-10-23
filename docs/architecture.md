@@ -1,6 +1,6 @@
 # sing — instrument architecture
 
-**Design decision / 2026-10-21.** This is the planned contract, not a claim of working synthesis.
+**Design decision / 2026-10-21, native-first revision / 2026-10-23.** A simple offline Swift formant renderer exists and has emitted WAV; the greater real-time MIDI 2.0 singing architecture below remains a target, **not** verified live execution. Marie Ork and Alter/Ego are out of the required implementation path. See [native voice-first decision](native-stack-decision-2026-10-23.md).
 
 ## Pipeline
 
@@ -10,17 +10,20 @@ Reframe passage + source revision + author selection
 Satzfunk editorial direction → AudioTalk/ScoreKit/Teatro score
       ↓
 sing phrase compiler:
-  grapheme-to-phoneme → syllabification → alignment → articulatory timeline
+  phoneme plan → syllable alignment → articulatory timeline
       ↓
 renderer-neutral performance:
   voice identity; vowel/consonant state; note schedule; continuous expression
       ↓
-typed MIDI 2.0 UMP + separate versioned instrument state
+our native synthesis:
+  glottal excitation → stateful formants → timed articulations → PCM
+      ↑
+existing typed MIDI 2.0 UMP + separate versioned instrument state
+  (live event adapter pending; offline input currently comes from JSON)
       ↓
-renderer adapters:
-  A) signed Alter/Ego AU with licensed voice (reference, MIDI1 boundary)
-  B) native midi2sampler + formant/pitch/excitation extensions (target)
-  C) Csound or neural backend when demonstrably available (optional)
+optional future adapters:
+  consented sample/resynthesis voice or separately qualified renderer
+  (no mandatory commercial voice or imported plugin state)
       ↓
 captured PCM/audio + timing/rights receipts → Satzfunk private audition
       ↓
@@ -39,7 +42,7 @@ explicit author approval → authorized estate publisher / First Hearing
 
 A voiced sound is conventionally decomposed into excitation (voicing/noise), time-varying spectral envelope/formants, and articulation. Pitch change **must not automatically shift formants**. Vowels must sustain across notes; unvoiced consonants need correctly placed attacks/releases and aperiodic noise. Joining fixed recordings alone is insufficient.
 
-Candidate native implementation: a recorded consented phonetic corpus plus loop/crossfade operations from midi2sampler; perform pitch-synchronous or vocoder-style resynthesis with explicit formant treatment, continuous voice state, breath and acoustic quality controls. Neural synthesis is a replaceable backend, not required for MVP. An independent implementation may study WORLD, but verify actual licence and integration constraints before adoption.
+Implemented first native path: an independent Swift offline source/filter instrument using original glottal excitation, three-band formant resonators, timing and amplitude envelopes. It only covers the artificial la/mi/na fixture and has not passed a listening intelligibility verdict. Next: improve vocal excitation/articulation and connect existing MIDI 2.0 delivery. A consented sample/phonetic corpus path may later reuse actual exported midi2sampler operations with independent pitch/formant handling. Neural synthesis is optional, not the MVP.
 
 ## MIDI contract
 
@@ -55,11 +58,11 @@ No allocations/locks/file I/O in the native render callback, bounded scheduling 
 
 ## Renderer adapters
 
-**Alter/Ego compatibility:** use the vendor Audio Unit as an unmodified black-box interpreter of derived ARIA state and MIDI, with licensed voice. An adapter must record state hash, preset identity, audio capture and MIDI route. Alter/Ego compatibility does not grant voice-bank redistribution or proprietary implementation rights.
+**Historical compatibility only:** the old Alter/Ego / ARIA / Marie Ork workflow is preserved for source research and comparison; no plugin, license, voicebank or preset is needed to build or test our native singer. There is no requirement to implement its adapter.
 
-**Native sing voice:** owns phonetic timeline and DSP without depending on Alter/Ego or Phonem formats. Two complementary native models share one score: (1) a consented recorded-phoneme sampler/resynthesis voice, retaining pitch/formant independence; (2) a procedural phonetic synthesizer with controllable excitation/noise, resonator/formant centers and bandwidths, and transitions informed by Wolfgang Palm's PPG Phonem workflow. The latter can produce original synthetic singing without sampling an identifiable singer. Reuse midi2sampler's actual included primitives where applicable, then implement missing sampler, resonator, excitation, pitch and real-time rendering pieces. Do not mistake its README's excluded corpus/validation/resampling features for exported package products. See [Phonem reference](phonem-reference.md).
+**Native sing voice (implemented in part):** SingVoice is our own, independently authored Swift formant-based offline synthesis engine. It has original sound production, limited articulatory mapping, and tested deterministic WAV output, but no proven intelligible singing. The remaining target is a full real-time phonetic timeline, controllable excitation/noise, moving formant centers, legato, melisma, per-note MIDI 2.0 expression and physical output. Optional licensed/consented resynthesis may reuse actual exported midi2sampler primitives. The historical [Phonem reference](phonem-reference.md) informs questions, never supplies source or binaries.
 
-**Csound and others:** optional score/render implementations after linkage and output are witnessed; Teatro's local Csound C target currently contains a non-audible dummy/stub.
+**Csound and others:** optional, separate render implementations only after independent linkage and audio output are witnessed. Nothing of this kind is a prerequisite for the native singer.
 
 ## Minimal portable phrase contract
 

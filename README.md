@@ -2,9 +2,9 @@
 
 **MIDI 2.0-native singing instruments for Fountain Coach.**
 
-**Status: architecture and source audit, 21 October 2026. No native singing render is claimed.**
+**Status, 23 October 2026:** original Swift procedural voice now builds and renders offline PCM/WAV. First sound is a synthetic acoustic test, **not yet confirmed intelligible singing or a live MIDI 2.0 instrument**. The project no longer depends on Marie Ork or Alter/Ego.
 
-A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Its reference lineages include Plogue Alter/Ego's playable lyric-and-MIDI workflow **and Wolfgang Palm's PPG Phonem for iPad**, with its controllable 12-resonator vocal synthesis. Neither proprietary implementation is part of this source.
+A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Our own glottal-excitation/formant synthesis is the implementation path. Alter/Ego and Wolfgang Palm's PPG Phonem remain **historical, black-box references only**; neither proprietary implementation is part of this source or required to build and render.
 
 ## Position in the estate
 
@@ -17,7 +17,7 @@ A voice is an instrument, a syllable is a timed phonetic state, and a performanc
 
 ## One voice; many performances
 
-A source passage and its hash are not a voice bank. A voice bank and its licence are not a score. An executable score and its renderer are not a published First Hearing. Keeping these separate lets one score be performed by Alter/Ego, a native sample/formant singer, a consented human voice, or an explicitly qualified future neural model.
+A source passage and its hash are not a voice bank. A voice bank and its licence are not a score. An executable score and its renderer are not a published First Hearing. Keeping these separate will let one score be performed by an independent procedural singer, a consented sample voice, or an explicitly qualified future neural model. Historic vendor compatibility is optional research, not a product gate.
 
 **7VST / Seven Against Thebes** is the documented historical specimen: a 2017 Alter/Ego/Bidule/ARIA experiment and privately restored audio/text evidence. The author also reports extensive use of **PPG Phonem for iPad** in the historical Bandcamp work; particular track assignments have not yet been independently established. New renditions are **new editions**, never silently labelled as the historical production. See [7VST lineage](docs/7vst-case-study.md).
 
@@ -25,6 +25,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 
 ## Documentation and first milestone
 
+- [23 October: native voice first and verified boundaries](docs/native-stack-decision-2026-10-23.md)
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
@@ -35,16 +36,19 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Publishing, consent and rights](docs/rights-and-release.md)
 - [Provisional performance JSON schema](schemas/sing-phrase-v1.schema.json) and [synthetic phrase example](examples/three-syllables.json)
 
-**First acceptance:** one intentionally synthetic three-syllable phrase, three timed MIDI notes, a real renderer, isolated recorded audio, and a verifiable execution receipt. Follow with a multi-note vowel (melisma) and note-off release. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
+**First milestone:** the authored three-syllable phrase drives a deterministic, independent offline Swift renderer and produces recorded PCM. Build tests and non-silent measurements pass. **First singing acceptance is pending actual listening confirmation of articulated la mi na.** Next: improve phoneme intelligibility, independent pitch/formant motion, melisma and release; connect typed MIDI 2.0 note events through existing midi2. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
 
-## Local documentary test
+## Local build and acoustic test
 
 ```sh
+swift test
+swift run -c release sing-render examples/three-syllables.json /tmp/sing-la-mi-na.wav
+swift run -c release sing-render examples/three-syllables.json /tmp/sing-control.wav --no-notes-control
 python3 -m unittest discover -s tests -v
 python3 tools/check_phrase.py examples/three-syllables.json
 ```
 
-The validator checks phrase/note alignment and rejects false rendering or release states. It additionally checks the complete JSON Schema only when the optional `jsonschema` Python package is installed. These tests do **not** synthesize or verify audio. No GitHub CI is configured.
+The Swift tests measure deterministic PCM, verify WAV output, reject unknown phonemes, and require silence for the no-note control. The Python validator checks phrase/note alignment and rejects false authored rendering or release states, with optional full JSON Schema validation when the `jsonschema` package is installed. These tests verify **sample production, not perceived intelligibility**, human consent, musicality or physical MIDI delivery. No GitHub CI is configured.
 
 ## Evidence standard
 

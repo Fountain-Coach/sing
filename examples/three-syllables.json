@@ -95,6 +95,6 @@
   "renderIntent": {
     "state": "not-rendered",
     "release": "not-admitted",
-    "preferredRenderer": "licensed-AlterEgo-reference-then-native-sing"
+    "preferredRenderer": "sing.original.procedural.formants.v0"
   }
 }
