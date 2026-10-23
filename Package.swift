@@ -11,6 +11,6 @@ let package = Package(
     targets: [
         .target(name: "SingVoice", path: "Sources/SingVoice"),
         .executableTarget(name: "SingRender", dependencies: ["SingVoice"], path: "Sources/sing-render"),
-        .testTarget(name: "SingVoiceTests", dependencies: ["SingVoice"], path: "Tests/SingVoiceTests")
+        .testTarget(name: "SingVoiceTests", dependencies: ["SingVoice"], path: "tests/SingVoiceTests")
     ]
 )
