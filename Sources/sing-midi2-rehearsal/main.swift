@@ -6,14 +6,18 @@ import SingMIDI2
 // It does not create or connect to an Apple CoreMIDI endpoint.
 do {
     let args = Array(CommandLine.arguments.dropFirst())
-    guard (2...3).contains(args.count), args.count != 3 || args[2] == "--pressure" else {
-        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure]\n", stderr)
+    let flags = Array(args.dropFirst(2))
+    guard args.count >= 2, flags.allSatisfy({ ["--pressure", "--realtime"].contains($0) }),
+          Set(flags).count == flags.count else {
+        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure] [--realtime]\n", stderr)
         exit(2)
     }
+    let pressureRequested = flags.contains("--pressure")
+    let realtimeRequested = flags.contains("--realtime")
     let document = try JSONDecoder().decode(PhraseDocument.self,
         from: Data(contentsOf: URL(fileURLWithPath: args[0])))
     var events = try SingMIDI2Score.compile(document)
-    if args.count == 3 {
+    if pressureRequested {
         guard document.performance.notes.count > 1 else {
             throw SingMIDI2Error.invalid("Expressive audition requires at least two authored notes")
         }
@@ -24,7 +28,13 @@ do {
         events.append(pressure)
         events.sort { $0.atMilliseconds < $1.atMilliseconds }
     }
-    let pcm = try SingMIDI2Score.rehearse(document, events: events)
+    let pcm: RenderedSound
+    if realtimeRequested {
+        let plan = try SingMIDI2Score.prepareRealtime(document, events: events)
+        pcm = RealtimeSinger(prepared: plan).renderOffline(blockFrames: 128)
+    } else {
+        pcm = try SingMIDI2Score.rehearse(document, events: events)
+    }
     try WaveWriter.write(pcm, to: URL(fileURLWithPath: args[1]))
     let result: [String: Any] = [
         "renderer": "sing.original.procedural.formants.v0",
@@ -33,7 +43,8 @@ do {
         "coreMIDI": false,
         "packetCount": events.count,
         "noteCount": document.performance.notes.count,
-        "perNotePressure": args.count == 3,
+        "perNotePressure": pressureRequested,
+        "sampleAccurateRealtimeInnerLoop": realtimeRequested,
         "sampleRate": pcm.sampleRate,
         "frames": pcm.samples.count,
         "rms": pcm.rms, "peak": pcm.peak,

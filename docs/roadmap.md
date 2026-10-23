@@ -1,6 +1,6 @@
 # Scenarios and acceptance — sing
 
-**Development status, 2026-10-23:** our own Swift procedural-formant offline engine now builds and emits reproducible PCM WAV from the original synthetic fixture. Both Linux and macOS compile/tests passed. Intelligible singing, physical MIDI 2.0 routing, real-time audio and publication are **not** yet demonstrated. Marie Ork / Alter-Ego are removed from the active implementation path. See [native voice-first decision](native-stack-decision-2026-10-23.md).
+**Development status, 2026-10-23:** original portable Swift formant engine, typed MIDI 2.0 UMP parser and bounded per-frame PCM callback have all built on Apple Silicon macOS. 15 Swift tests passed, and a separate AVAudioEngine adapter successfully started, processing all 90,240 scheduled frames on the default 48 kHz audio output with **no CoreMIDI**. Neither human-intelligible singing, live external MIDI transport, runtime memory/jitter guarantees, analogue capture nor public issue is established. See [native voice first](native-stack-decision-2026-10-23.md) and [real-time audio witness](evidence/realtime-macos-output-2026-10-23.md).
 
 ## S0 — source and capability inventory (done, documentary only)
 
@@ -20,7 +20,10 @@
 - [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
 - [x] Compile, decode and rehearse with the **existing** `Fountain-Coach/midi2` version 0.12.8 typed 64-bit Universal MIDI Packets (Note On, Note Off, 32-bit Polyphonic Pressure). Decoded pressure measurably changes the generated PCM; the path is **in-process/offline** and does not use CoreMIDI.
 - [ ] Admit a real-time, bounded event scheduling and audio-output path without CoreMIDI. No live UMP endpoint, on-wire transport, MIDI 2.0 device or sound-card witness has yet been demonstrated.
-- [ ] Implement melisma, phrase reset, legato, silence/rest, real-time callback and device output without untested promises.
+- [x] Demonstrate monophonic vowel-preserving melisma across two note pitches (no retriggered consonant), reset/repeated PCM invariance, a 400 ms bounded release tail, and sample-identical output for varying buffer sizes.
+- [x] Run a separate macOS AVAudioEngine PCM adapter against the instrument callback. Output engine started and the voice processed all 90,240 scheduled frames at 48 kHz. No CoreMIDI.
+- [ ] Independently measure callback allocation behavior, worst-case latency, underruns and extended host stability; obtain an actual listening/loopback witness.
+- [ ] Admit externally arriving MIDI 2.0 events from an authorized non-CoreMIDI transport. Live external MIDI source is not yet implemented.
 
 ## S2 — native independent singer (pending)
 

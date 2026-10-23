@@ -2,7 +2,7 @@
 
 **MIDI 2.0-native singing instruments for Fountain Coach.**
 
-**Status, 23 October 2026:** our procedural Swift voice and new `SingMIDI2` target now compile **typed MIDI 2.0 Universal MIDI Packets** into a deterministic, transport-free offline PCM rehearsal. MIDI 2.0 Note On/Off and 32-bit polyphonic pressure affect generated sound. **No CoreMIDI, Apple Audio Unit, MIDI 1.0 bridge, or physical endpoint is used.** Intelligible singing, real-time rendering and external transport remain unproven. Marie Ork and Alter/Ego are not dependencies.
+**Status, 23 October 2026:** our original Swift singing voice now has a **persistent, callback-driven 48 kHz PCM engine**, fed by prevalidated typed MIDI 2.0 Universal MIDI Packets. Note On/Off, polyphonic pressure, a syllable-preserving melisma, and changing pitch work in one native voice. A separate macOS AVAudioEngine adapter successfully started and consumed all scheduled frames on the machine's default audio output. **CoreMIDI is excluded**; there is no MIDI 1.0 conversion, vendor voicebank or new MIDI transport. Real-time worst-case performance, externally received MIDI and human-verified intelligibility remain pending.
 
 A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Our own glottal-excitation/formant synthesis is the implementation path. Alter/Ego and Wolfgang Palm's PPG Phonem remain **historical, black-box references only**; neither proprietary implementation is part of this source or required to build and render.
 
@@ -27,6 +27,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 
 - [23 October: native voice first and verified boundaries](docs/native-stack-decision-2026-10-23.md)
 - [23 October: typed MIDI 2.0 UMP rehearsal evidence](docs/evidence/ump-rehearsal-2026-10-23.md)
+- [23 October: real-time voice callback and macOS audio-output witness](docs/evidence/realtime-macos-output-2026-10-23.md)
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
@@ -37,7 +38,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Publishing, consent and rights](docs/rights-and-release.md)
 - [Provisional performance JSON schema](schemas/sing-phrase-v1.schema.json) and [synthetic phrase example](examples/three-syllables.json)
 
-**First milestone:** the authored three-syllable phrase drives independent Swift synthesis through actual typed MIDI 2.0 UMP Note On/Off; incoming polyphonic-key-pressure UMP also changes the PCM amplitude. This happens wholly **in-process** with no transport or CoreMIDI. **First singing acceptance remains pending an actual listening verdict on la mi na.** Next: improve articulation, independent pitch/formant motion, melisma, and true real-time scheduling without an Apple MIDI bridge. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
+**Current milestone:** typed MIDI 2.0 note/pressure packets are decoded off the audio thread into sample-positioned events; a persistent synthesis callback produces reproducible audio across changing host buffer sizes, holds vowel articulation across melisma, and drives a separately isolated macOS audio output. **First singing acceptance remains pending an actual listening verdict on la mi na** and measured callback performance under load. Next: expressive pitch/formant motion, breath/consonants, robust reset and independent non-CoreMIDI transport. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
 
 ## Local build and acoustic test
 
@@ -47,11 +48,15 @@ swift run -c release sing-render examples/three-syllables.json /tmp/sing-la-mi-n
 swift run -c release sing-render examples/three-syllables.json /tmp/sing-control.wav --no-notes-control
 swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-ump.wav
 swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-pressure.wav --pressure
+swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-realtime.wav --realtime
+swift run sing-macos-output examples/three-syllables.json --probe
+# plays quietly on the machine's default output only when explicitly requested:
+swift run sing-macos-output examples/three-syllables.json --play
 python3 -m unittest discover -s tests -v
 python3 tools/check_phrase.py examples/three-syllables.json
 ```
 
-The Swift tests measure deterministic PCM, typed MIDI 2.0 Note On/Off and Polyphonic Pressure events, note lifecycle and rejection of malformed packets, verify WAV output, reject unknown phonemes, and require silence for the no-note control. The Python validator checks phrase/note alignment and rejects false authored rendering or release states, with optional full JSON Schema validation when the `jsonschema` package is installed. These tests verify **sample production, not perceived intelligibility**, human consent, musicality or physical MIDI delivery. No GitHub CI is configured.
+The Swift tests measure deterministic PCM, typed MIDI 2.0 Note On/Off and Polyphonic Pressure events, note lifecycle and rejection of malformed packets, real-time buffer-size invariance, vowel-preserving melisma, quiet release and CoreMIDI exclusion; they verify WAV output, reject unknown phonemes and require silence for the no-note control. The Python validator checks phrase/note alignment and rejects false authored rendering or release states, with optional full JSON Schema validation when the `jsonschema` package is installed. These tests verify **sample production, not perceived intelligibility**, human consent, musicality or physical MIDI delivery. No GitHub CI is configured.
 
 ## Evidence standard
 

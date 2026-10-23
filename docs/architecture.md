@@ -1,6 +1,6 @@
 # sing — instrument architecture
 
-**Design decision / 2026-10-21, native-first revision / 2026-10-23.** A simple offline Swift formant renderer exists and has emitted WAV; the greater real-time MIDI 2.0 singing architecture below remains a target, **not** verified live execution. Marie Ork and Alter/Ego are out of the required implementation path. See [native voice-first decision](native-stack-decision-2026-10-23.md).
+**Design decision / 2026-10-21, native-first revision / 2026-10-23.** The original Swift formant renderer is now paired with a sample-positioned, persistent RealtimeSinger callback and separate macOS AVAudioEngine output host. Both MIDI2-in-process and audio-engine execution have been witnessed. **A live external MIDI 2.0 transport, quantified hard-real-time deadline guarantees and perceptually confirmed singing are not yet established.** Marie Ork, Alter/Ego and CoreMIDI are out of the implementation path. See [native voice first](native-stack-decision-2026-10-23.md) and [real-time witness](evidence/realtime-macos-output-2026-10-23.md).
 
 ## Pipeline
 

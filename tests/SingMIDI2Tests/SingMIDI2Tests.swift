@@ -87,6 +87,88 @@ final class SingMIDI2Tests: XCTestCase {
             XCTAssertFalse(source.contains("import " + "AudioToolbox"), "\(file) imports a host audio framework")
             XCTAssertFalse(source.contains(".product(name: " + "\"TeatroAppleBridge\""), "\(file) depends on an Apple bridge")
         }
+        let host = try String(contentsOf: root.appendingPathComponent(
+            "Sources/sing-macos-output/main.swift"), encoding: .utf8)
+        XCTAssertFalse(host.contains("import " + "CoreMIDI"))
+        XCTAssertFalse(host.contains("MIDI" + "OutputPortCreate"))
+        XCTAssertTrue(host.contains("import AVFoundation"))
+    }
+
+    func testSampleAccurateBufferSizesProduceIdenticalPCM() throws {
+        let doc = try phrase()
+        let packets = try SingMIDI2Score.compile(doc)
+        let prepared = try SingMIDI2Score.prepareRealtime(doc, events: packets)
+        XCTAssertEqual(prepared.eventCount, 6)
+        let small = RealtimeSinger(prepared: prepared)
+        let a = small.renderOffline(blockFrames: 37)
+        let large = RealtimeSinger(prepared: prepared)
+        let b = large.renderOffline(blockFrames: 1024)
+        XCTAssertEqual(a.samples, b.samples)
+        XCTAssertTrue(a.samples.allSatisfy(\.isFinite))
+        XCTAssertGreaterThan(a.rms, 0.001)
+        XCTAssertEqual(small.articulationsStarted, 3)
+        XCTAssertTrue(small.isFinished)
+        small.reset()
+        let restarted = small.renderOffline(blockFrames: 256)
+        XCTAssertEqual(restarted.samples, a.samples)
+    }
+
+    func testMelismaRetainsOriginalVowelAcrossPitchChange() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let fixture = try Data(contentsOf: root.appendingPathComponent("examples/three-syllables.json"))
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture) as? [String: Any])
+        var performance = try XCTUnwrap(json["performance"] as? [String: Any])
+        var notes = try XCTUnwrap(performance["notes"] as? [[String: Any]])
+        notes.insert([
+            "id": "n1b", "syllableId": "s1", "pitch": 69,
+            "onMs": 410, "offMs": 435, "velocity16": 30_000,
+            "advanceSyllable": false
+        ], at: 1)
+        performance["notes"] = notes
+        json["performance"] = performance
+        let doc = try JSONDecoder().decode(PhraseDocument.self,
+            from: JSONSerialization.data(withJSONObject: json))
+        let packets = try SingMIDI2Score.compile(doc)
+        XCTAssertEqual(packets.count, 8)
+        let prepared = try SingMIDI2Score.prepareRealtime(doc, events: packets)
+        let voice = RealtimeSinger(prepared: prepared)
+        let rendered = voice.renderOffline(blockFrames: 128)
+        XCTAssertEqual(voice.articulationsStarted, 3)
+        XCTAssertTrue(rendered.samples.allSatisfy(\.isFinite))
+        XCTAssertGreaterThan(rendered.rms, 0.001)
+    }
+
+    func testRealtimePressureChangesOutputWithoutChangingScore() throws {
+        let doc = try phrase()
+        let events = try SingMIDI2Score.compile(doc)
+        var pressure = events
+        pressure.append(try SingMIDI2Score.notePressure(pitch: 65,
+            atMilliseconds: 650, value: 0))
+        pressure.sort { $0.atMilliseconds < $1.atMilliseconds }
+        let baseline = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: events))
+            .renderOffline(blockFrames: 64)
+        let expressive = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: pressure))
+            .renderOffline(blockFrames: 64)
+        XCTAssertNotEqual(baseline.samples, expressive.samples)
+        XCTAssertGreaterThan(baseline.rms, expressive.rms)
+    }
+
+    func testRealtimeReleaseIsQuietAndDerivativeBounded() throws {
+        let doc = try phrase()
+        let packets = try SingMIDI2Score.compile(doc)
+        let voice = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: packets))
+        let sound = voice.renderOffline(blockFrames: 511)
+        XCTAssertEqual(sound.samples.count, 90_240)
+        let tail = sound.samples.suffix(4_800)
+        let tailRMS = sqrt(tail.reduce(0.0) { $0 + Double($1) * Double($1) } / Double(tail.count))
+        XCTAssertLessThan(tailRMS, 0.003)
+        var largestStep = 0.0
+        for frame in 1..<sound.samples.count {
+            largestStep = max(largestStep,
+                abs(Double(sound.samples[frame]) - Double(sound.samples[frame - 1])))
+        }
+        XCTAssertLessThan(largestStep, 0.15)
     }
 
     func testNoExternalTransportAndAuthenticPressurePacket() throws {

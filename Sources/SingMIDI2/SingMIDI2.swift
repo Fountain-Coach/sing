@@ -130,6 +130,14 @@ public enum SingMIDI2Score {
         return completed
     }
 
+    /// Prepare bounded sample-accurate events and all formant coefficients off the audio thread.
+    /// Typed Universal MIDI Packets are decoded here; no Apple MIDI host or transport is involved.
+    public static func prepareRealtime(_ document: PhraseDocument, events: [TimedSingPacket],
+                                       sampleRate: Int = 48_000) throws -> RealtimePreparedPhrase {
+        try RealtimePreparedPhrase(document: document, notes: decode(document, events: events),
+                                   sampleRate: sampleRate)
+    }
+
     /// This is an isolated offline PCM rehearsal, not a live MIDI endpoint or sound-card witness.
     public static func rehearse(_ document: PhraseDocument, events: [TimedSingPacket],
                                 sampleRate: Int = 48_000) throws -> RenderedSound {

@@ -77,14 +77,14 @@ public struct SingPerformanceNote {
     }
 }
 
-private struct Formant {
+struct Formant {
     let frequency: Double
     let width: Double
     let gain: Double
 }
 
 // A real, stateful resonator (RBJ constant-skirt-gain bandpass), not a pre-recorded vowel.
-private struct Resonator {
+struct Resonator {
     let b0: Double
     let b2: Double
     let a1: Double
@@ -110,7 +110,7 @@ private struct Resonator {
     }
 }
 
-private struct VoiceBank {
+struct VoiceBank {
     var bands: [Resonator]
     let gains: [Double]
     init(_ formants: [Formant], sampleRate: Double) {
@@ -124,8 +124,8 @@ private struct VoiceBank {
     }
 }
 
-private struct Glottis {
-    let increment: Double
+struct Glottis {
+    var increment: Double
     var phase = 0.0
     init(midiPitch: Int, sampleRate: Double) {
         let frequency = 440 * pow(2, Double(midiPitch - 69) / 12)
@@ -174,16 +174,27 @@ public enum ProceduralSinger {
         var previousOff = -1
         var seenSyllables = Set<String>()
         var seenNotes = Set<String>()
+        var previousSyllable: String?
         for n in document.performance.notes {
             guard !n.id.isEmpty, seenNotes.insert(n.id).inserted,
                   n.onMs >= 0, n.offMs > n.onMs, n.onMs >= previousOff,
                   (0...127).contains(n.pitch), (1...65535).contains(n.velocity16) else {
                 throw SingError.invalid("Invalid, overlapping, or duplicate note \(n.id)")
             }
-            let known = syllables.contains { $0.id == n.syllableId }
-            guard known, n.advanceSyllable, seenSyllables.insert(n.syllableId).inserted else {
-                throw SingError.invalid("This first renderer needs one advancing note per syllable; melisma pending")
+            let sid = n.syllableId
+            guard syllables.contains(where: { $0.id == sid }) else {
+                throw SingError.invalid("Note references unknown syllable")
             }
+            if sid == previousSyllable {
+                guard !n.advanceSyllable else {
+                    throw SingError.invalid("Melisma must sustain the same syllable without retriggering")
+                }
+            } else {
+                guard n.advanceSyllable, seenSyllables.insert(sid).inserted else {
+                    throw SingError.invalid("New syllable requires one explicit advance; no backward cursor")
+                }
+            }
+            previousSyllable = sid
             previousOff = n.offMs
         }
     }
@@ -193,7 +204,7 @@ public enum ProceduralSinger {
         return t * t * (3 - 2 * t)
     }
 
-    private static func formants(for phoneme: String) -> [Formant] {
+    static func formants(for phoneme: String) -> [Formant] {
         switch phoneme {
         case "l": return [Formant(frequency: 440, width: 180, gain: 0.7), Formant(frequency: 1200, width: 260, gain: 0.8), Formant(frequency: 2550, width: 350, gain: 0.5)]
         case "m": return [Formant(frequency: 280, width: 120, gain: 0.9), Formant(frequency: 1050, width: 220, gain: 0.22), Formant(frequency: 2300, width: 320, gain: 0.08)]

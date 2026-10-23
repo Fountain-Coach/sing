@@ -14,7 +14,7 @@ Design and verify independently reproducible MIDI 2.0 singing instruments intero
 
 ## Non-negotiable
 1. **No fabricated listening receipts:** distinguish conceptual, source-inspected, compiled, simulated, real-device performed, captured audio, and publicly released.
-2. **No duplicate platform:** reuse Fountain-Coach/midi2 typed Universal MIDI Packets; no second MIDI plane, no new transport, no autonomous publication system. **CoreMIDI is explicitly prohibited** in sing, including bridges, sidecars and fallback paths. Keep hardware/audio output separate from packet parsing and offline synthesis.
+2. **No duplicate platform:** reuse Fountain-Coach/midi2 typed Universal MIDI Packets; no second MIDI plane, no new transport, no autonomous publication system. **CoreMIDI is explicitly prohibited** in sing, including bridges, sidecars and fallback paths. Keep hardware/audio output separate from packet parsing and synthesis. AVFoundation PCM output is allowed only in the separate macOS audio-host executable; it must never become a MIDI dependency of SingVoice or SingMIDI2.
 3. **No imported vendor assets:** no proprietary Alter/Ego code, Plogue binaries, Marie Ork/Daisy/Bones banks, private Aeschylus translations, 2017 source media, or secrets in Git.
 4. **No voice imitation without consent.** Capture and licensing are part of the instrument identity.
 5. **No claims from prose:** inspect Package.swift, compiled targets, implementation, executable endpoint and real output before declaring a capability.
@@ -25,7 +25,7 @@ Design and verify independently reproducible MIDI 2.0 singing instruments intero
 10. Never rewrite another repository automatically. Cross-repository changes require their owning contracts and corresponding tests.
 
 ## First scenario
-Start from `Package.swift` and the self-contained native Swift `SingVoice` synthesizer. Run `swift test` and both Python authored-phrase checks; make isolated native WAV audition with `swift run -c release sing-render examples/three-syllables.json /tmp/sing-la-mi-na.wav`. The no-note control must be silent. Native output is measured PCM only until the author hears intelligible phonemes. Then connect the existing midi2 packet stack, without creating a second transport plane. Never use the historical licensed voice as a required test.
+The current accepted execution contract is Fountain-Coach/midi2 typed UMP → SingMIDI2 **off-thread preflight** → bounded RealtimeSinger sample events → PCM. Run `swift test` and the existing Python phrase checks; run `sing-midi2-rehearsal --realtime` for deterministic audio. `sing-macos-output --probe` only inspects compatibility; `--play` actually makes sound on the default system output and must be explicitly requested. The host's successful playback report is not a human listening or analogue-capture witness. Never use CoreMIDI, Apple MIDI endpoints, proprietary voices, an alternate MIDI plane or GitHub CI.
 
 ## Working style
 Contributors must report: inspected refs, implementation change, exact local test command/result, audio witness when applicable, uncertainties, and downstream impact.
