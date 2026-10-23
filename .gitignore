@@ -16,3 +16,10 @@ voicebanks/
 *.component
 *.vst
 *.vst3
+# Audition and media bytes remain private until explicitly admitted
+*.wav
+*.aiff
+*.aif
+*.flac
+*.mp3
+*.mp4

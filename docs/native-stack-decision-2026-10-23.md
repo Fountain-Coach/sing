@@ -22,7 +22,7 @@ Review the first WAV by ear before declaring intelligible speech or singing. The
 
 1. **S1a acoustic witness:** audition the produced file on a real output and decide whether la mi na is intelligible. Repair articulation and formants if not. Record source hash and a truthful listening verdict.
 2. **S1b singing articulation:** add vowel stability, independent pitch/formant control, audible consonant articulation, breath and vibrato; test rests, note-off, phrase reset, melisma and pitch changes on a single vowel.
-3. **S1c typed MIDI 2.0 interface:** reuse Fountain-Coach/midi2 Universal MIDI Packets and timebase, mapping note lifecycle and per-note expression into instrument state. Never send text or a voicebank as pretend MIDI notes. Provide a governed, versioned instrument identity and transport capability report.
+3. **S1c typed MIDI 2.0 interface (in-process complete):** reuse Fountain-Coach/midi2 version 0.12.8 typed Universal MIDI Packets, mapping Note On/Off and full-resolution Polyphonic Pressure into native phrase instrument state. MIDI does not carry text or a voicebank. The implemented offline rehearsal has no external transport, CoreMIDI or hardware timebase; a physically witnessed, governed transport and real-time instrument remain future work.
 4. **S2 real-time implementation:** move audio callback processing into a bounded real-time path, reuse only actually exported midi2sampler primitives where needed, and verify buffer lifecycle, output routing, click budgets and practical latency. Do not conflate this with the offline renderer.
 5. **S3 rehearsal integration:** audition in Teatro; hand authored render candidates and source hashes to Satzfunk. Accept/publication remain separate, rights-controlled actions.
 

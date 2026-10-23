@@ -46,6 +46,37 @@ public struct RenderedSound {
     }
 }
 
+/// Transient performance data derived from timed instrument events.
+ /// Syllable assignment remains in the authored phrase, never inside MIDI packets.
+public struct SingPerformanceNote {
+    public struct PressurePoint {
+        public let timeMs: Int
+        public let normalized: Double
+        public init(timeMs: Int, normalized: Double) {
+            self.timeMs = timeMs
+            self.normalized = normalized
+        }
+    }
+    public let id: String
+    public let syllableId: String
+    public let pitch: Int
+    public let onMs: Int
+    public let offMs: Int
+    public let velocity16: Int
+    public let pressurePoints: [PressurePoint]
+
+    public init(id: String, syllableId: String, pitch: Int, onMs: Int,
+                offMs: Int, velocity16: Int, pressurePoints: [PressurePoint] = []) {
+        self.id = id
+        self.syllableId = syllableId
+        self.pitch = pitch
+        self.onMs = onMs
+        self.offMs = offMs
+        self.velocity16 = velocity16
+        self.pressurePoints = pressurePoints
+    }
+}
+
 private struct Formant {
     let frequency: Double
     let width: Double
@@ -172,20 +203,50 @@ public enum ProceduralSinger {
         }
     }
 
-    public static func render(_ document: PhraseDocument, sampleRate: Int = 48000, muteNotes: Bool = false) throws -> RenderedSound {
+    public static func render(_ document: PhraseDocument, sampleRate: Int = 48000,
+                              muteNotes: Bool = false,
+                              performanceNotes: [SingPerformanceNote]? = nil) throws -> RenderedSound {
         try validate(document)
         guard (16000...192000).contains(sampleRate) else {
             throw SingError.invalid("Unsupported sample rate")
         }
+        let notes = performanceNotes ?? document.performance.notes.map {
+            SingPerformanceNote(id: $0.id, syllableId: $0.syllableId,
+                                pitch: $0.pitch, onMs: $0.onMs, offMs: $0.offMs,
+                                velocity16: $0.velocity16)
+        }
+        let authored = document.performance.notes
+        guard notes.count == authored.count else {
+            throw SingError.invalid("Performed note count does not match authored phrase")
+        }
+        var previousOff = -1
+        for (index, note) in notes.enumerated() {
+            guard note.id == authored[index].id,
+                  note.syllableId == authored[index].syllableId,
+                  (0...127).contains(note.pitch), (1...65535).contains(note.velocity16),
+                  note.onMs >= previousOff, note.offMs > note.onMs else {
+                throw SingError.invalid("Performed note timing or identity invalid")
+            }
+            var previousPressure = -1
+            for point in note.pressurePoints {
+                guard point.timeMs >= note.onMs, point.timeMs <= note.offMs,
+                      point.timeMs >= previousPressure, point.normalized.isFinite,
+                      (0.0...1.0).contains(point.normalized) else {
+                    throw SingError.invalid("Invalid per-note pressure timeline")
+                }
+                previousPressure = point.timeMs
+            }
+            previousOff = note.offMs
+        }
         let tailMs = 85
-        let lastOff = document.performance.notes.last!.offMs
+        let lastOff = notes.last!.offMs
         let frameCount = Int(ceil(Double(lastOff + tailMs) * Double(sampleRate) / 1000))
         var output = [Float](repeating: 0, count: frameCount)
         guard !muteNotes else { return RenderedSound(sampleRate: sampleRate, samples: output) }
         let syllablesByID = Dictionary(uniqueKeysWithValues: document.phrase.syllables.map { ($0.id, $0) })
         let rate = Double(sampleRate)
 
-        for note in document.performance.notes {
+        for note in notes {
             let syllable = syllablesByID[note.syllableId]!
             var onset = VoiceBank(formants(for: syllable.phonemes[0].symbol), sampleRate: rate)
             var nucleus = VoiceBank(formants(for: syllable.phonemes[1].symbol), sampleRate: rate)
@@ -195,7 +256,18 @@ public enum ProceduralSinger {
             let endFrame = min(output.count, offFrame + Int(round(0.075 * rate)))
             let duration = Double(note.offMs - note.onMs) / 1000
             let velocity = Double(note.velocity16) / 65535
+            var pressureIndex = 0
+            var targetGain = 1.0
+            var smoothedGain = 1.0
+            let pressureSmoothing = 1 - exp(-1 / (0.012 * rate))
             for frame in onFrame..<endFrame {
+                let absoluteMs = Double(frame) * 1000 / rate
+                while pressureIndex < note.pressurePoints.count &&
+                      Double(note.pressurePoints[pressureIndex].timeMs) <= absoluteMs {
+                    targetGain = 0.35 + 1.30 * note.pressurePoints[pressureIndex].normalized
+                    pressureIndex += 1
+                }
+                smoothedGain += (targetGain - smoothedGain) * pressureSmoothing
                 let t = Double(frame - onFrame) / rate
                 let attack = shape(t / 0.012)
                 let release = t <= duration ? 1 : 1 - shape((t - duration) / 0.070)
@@ -203,7 +275,7 @@ public enum ProceduralSinger {
                 let source = glottis.sample()
                 let a = onset.sample(source)
                 let b = nucleus.sample(source)
-                let gain = attack * release * (0.7 + 0.3 * velocity)
+                let gain = attack * release * (0.7 + 0.3 * velocity) * smoothedGain
                 let sample = gain * (a * onsetMix * 0.65 + b * (1 - onsetMix))
                 output[frame] += Float(sample)
             }

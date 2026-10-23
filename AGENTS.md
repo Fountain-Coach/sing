@@ -14,7 +14,7 @@ Design and verify independently reproducible MIDI 2.0 singing instruments intero
 
 ## Non-negotiable
 1. **No fabricated listening receipts:** distinguish conceptual, source-inspected, compiled, simulated, real-device performed, captured audio, and publicly released.
-2. **No duplicate platform:** reuse current engine/transport, do not introduce a second MIDI plane or an autonomous publication system.
+2. **No duplicate platform:** reuse Fountain-Coach/midi2 typed Universal MIDI Packets; no second MIDI plane, no new transport, no autonomous publication system. **CoreMIDI is explicitly prohibited** in sing, including bridges, sidecars and fallback paths. Keep hardware/audio output separate from packet parsing and offline synthesis.
 3. **No imported vendor assets:** no proprietary Alter/Ego code, Plogue binaries, Marie Ork/Daisy/Bones banks, private Aeschylus translations, 2017 source media, or secrets in Git.
 4. **No voice imitation without consent.** Capture and licensing are part of the instrument identity.
 5. **No claims from prose:** inspect Package.swift, compiled targets, implementation, executable endpoint and real output before declaring a capability.

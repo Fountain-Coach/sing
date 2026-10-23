@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "midi2",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Fountain-Coach/midi2.git",
+      "state" : {
+        "revision" : "08fe3d2a02d10e7737b0c533ece583b08397c67b",
+        "version" : "0.12.8"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+        "version" : "1.8.2"
+      }
+    },
+    {
+      "identity" : "swift-numerics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-numerics.git",
+      "state" : {
+        "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version" : "1.1.1"
+      }
+    }
+  ],
+  "version" : 2
+}

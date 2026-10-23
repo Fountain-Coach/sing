@@ -18,7 +18,8 @@
 - [x] Produce 48 kHz mono 16-bit PCM WAV with recorded duration, level and SHA-256 digest (test fixture; no human audibility judgement).
 - [ ] Have the author identify intelligible `la mi na` by listening to native output; redesign formant and consonant transitions as required.
 - [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
-- [ ] Receive note on/off and per-note expression via the **existing** typed MIDI 2.0 route; current JSON-to-PCM renderer is offline, not a live MIDI instrument.
+- [x] Compile, decode and rehearse with the **existing** `Fountain-Coach/midi2` version 0.12.8 typed 64-bit Universal MIDI Packets (Note On, Note Off, 32-bit Polyphonic Pressure). Decoded pressure measurably changes the generated PCM; the path is **in-process/offline** and does not use CoreMIDI.
+- [ ] Admit a real-time, bounded event scheduling and audio-output path without CoreMIDI. No live UMP endpoint, on-wire transport, MIDI 2.0 device or sound-card witness has yet been demonstrated.
 - [ ] Implement melisma, phrase reset, legato, silence/rest, real-time callback and device output without untested promises.
 
 ## S2 — native independent singer (pending)
