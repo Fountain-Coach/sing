@@ -10,10 +10,10 @@ Design and verify independently reproducible MIDI 2.0 singing instruments intero
 - **Teatro/ScoreKit/AudioTalk:** score and expressive direction.
 - **midi2:** Universal MIDI Packets, profiles, property exchange and transport.
 - **midi2sampler / Csound / others:** audio implementation only after actual build and sound verification.
-- **FountainStore / EstatePublisher:** immutable custody and authorized publication; **Ear:** physical execution witness if implemented.
+- **FountainStore / EstatePublisher:** immutable custody and authorized publication; **Teatro/Ear:** governed source-addressed audio listening, independent acoustic measurement and, when implemented and separately qualified, phoneme-recognition acceptance. The author is not the engineering comparison oracle. Ear is **not** an editor or rights-granting authority.
 
 ## Non-negotiable
-1. **No fabricated listening receipts:** distinguish conceptual, source-inspected, compiled, simulated, real-device performed, captured audio, and publicly released.
+1. **No fabricated listening receipts:** distinguish conceptual, source-inspected, compiled, simulated, Ear-measured real AudioWorklet audio, independently recognized phonemes, real-device performed, physically captured audio, and publicly released. Ear signal/RMS, pitch proxy or a fixed MIDI note is **not** intelligible singing.
 2. **No duplicate platform:** reuse Fountain-Coach/midi2 typed Universal MIDI Packets; no second MIDI plane, no new transport, no autonomous publication system. **CoreMIDI is explicitly prohibited** in sing, including bridges, sidecars and fallback paths. Keep hardware/audio output separate from packet parsing and synthesis. AVFoundation PCM output is allowed only in the separate macOS audio-host executable; it must never become a MIDI dependency of SingVoice or SingMIDI2.
 3. **No imported vendor assets:** no proprietary Alter/Ego code, Plogue binaries, Marie Ork/Daisy/Bones banks, private Aeschylus translations, 2017 source media, or secrets in Git.
 4. **No voice imitation without consent.** Capture and licensing are part of the instrument identity.

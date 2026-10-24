@@ -16,7 +16,8 @@
 - [x] Compile native Swift package, validate supported phonemes and phrase/note identity, render a three-note synthetic vowel sequence to isolated WAV output.
 - [x] Test repeatability, measured sound, valid WAV, unknown phoneme rejection and no-note silence. Five Swift tests passed on macOS and Linux, separately from existing five Python authored-phrase tests.
 - [x] Produce 48 kHz mono 16-bit PCM WAV with recorded duration, level and SHA-256 digest (test fixture; no human audibility judgement).
-- [ ] Have the author identify intelligible `la mi na` by listening to native output; redesign formant and consonant transitions as required.
+- [x] Have **Ear**, rather than the author, independently measure and select an acoustic **development baseline** from the three takes. Teatro's actual shipped Ear AudioWorklet and a scoped spectral feature extension selected **articulated** under a declared nasal-onset/steady-vowel criterion. This does **not** demonstrate phonetic intelligibility. See [Ear selection witness](evidence/2026-10-24-ear-three-take-selection.md).
+- [ ] Have Ear's **independently qualified phoneme recognizer**, with negative controls and confidence evidence, demonstrate intelligible `la mi na`. The shipped Ear worklet currently measures signal/silence and emits a fixed note 48 placeholder. A human listener or the author is **not** the default instrument-development QA oracle. Improve consonant and vowel synthesis until this automated recognition gate is genuinely met.
 - [x] Prepare three-way private comparison with identical score/duration, verified PCM hashes, actual /m/ and /n/ onset changes, and optional pitch/breath/vibrato. All three WAV digests match Mac-source renders; see [comparison evidence](evidence/three-take-comparison-2026-10-24.md).
 - [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
 - [x] Compile, decode and rehearse with the **existing** `Fountain-Coach/midi2` version 0.12.8 typed 64-bit Universal MIDI Packets (Note On, Note Off, 32-bit Polyphonic Pressure). Decoded pressure measurably changes the generated PCM; the path is **in-process/offline** and does not use CoreMIDI.
@@ -38,7 +39,8 @@
 - [ ] Improve noisy/unvoiced consonants, vocal naturalness and verify click-free transitions by listening and more complete acoustic metrics.
 - [x] Implement and test explicit melisma that retains the vowel and does not restart consonant articulation on the second pitch.
 - [ ] Implement general ties/legato control, explicit rests, repeated-syllable advancement, phrase cursor management and pitch-continuous articulation beyond the current monophonic fixture.
-- [ ] Compare native auditions with author-selected acoustic/perceptual reference criteria; vendor fidelity and Marie Ork compatibility are **not** acceptance requirements.
+- [x] Compare the three private auditions using Ear's explicit source, analysis window, energy, spectral-onset and diagnostic-pitch measures. This is a verified **acoustic proxy**, not a claim to human perception.
+- [ ] Qualify Ear's phonetic-recognition detector independently from the synthesis source, with uncertainty, negative controls and confidence before setting a lyric-recognition acceptance criterion. Vendor fidelity and Marie Ork compatibility are **not** acceptance requirements.
 
 ## S3 — composer and Satzfunk (pending)
 

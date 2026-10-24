@@ -30,6 +30,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [23 October: real-time voice callback and macOS audio-output witness](docs/evidence/realtime-macos-output-2026-10-23.md)
 - [24 October: extended native expressive audition and physical output witness](docs/evidence/expressive-singing-2026-10-24.md)
 - [24 October: three-take listening comparison and verified checksums](docs/evidence/three-take-comparison-2026-10-24.md)
+- [24 October: actual Ear worklet chooses the articulated development baseline](docs/evidence/2026-10-24-ear-three-take-selection.md)
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
@@ -40,7 +41,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Publishing, consent and rights](docs/rights-and-release.md)
 - [Provisional performance JSON schema](schemas/sing-phrase-v1.schema.json), [short synthetic phrase](examples/three-syllables.json), and [five-second sustained melisma](examples/sustained-melisma.json)
 
-**Current milestone:** the identical synthetic phrase now has **plain, articulated and expressive auditions**, distinguished by actual waveform differences and preserved by source/audio hashes. Typed MIDI 2.0 notes, pressure, pitch bend and breath are decoded off the audio thread; the independent native voice produces sustained vowels, a voiced nasal onset, optional vibrato and melisma without a CoreMIDI dependency. **First intelligible-singing acceptance remains pending a human listener's verdict** and callback measurements under load. Next: assess syllable clarity by listening, improve phonemes and natural phrasing, then test a separately authorized non-CoreMIDI transport. No historical text, voice banks, passwords or audio exports belong in public Git.
+**Current milestone:** all three synthetic takes were passed to **Teatro's actual Ear AudioWorklet**, plus a separately scoped test-only Ear spectral-analysis worklet in a real Chrome Web Audio graph. The observed **nasal onset attenuation and steady-vowel parity select the articulated take as the next phonetic-development baseline**; the expressive take remains a distinct performance option. **Ear does not yet recognize lyrics**, and its shipped note 48 output is a fixed placeholder, not measured pitch. The acceptance gap is an independently witnessed phoneme recognizer owned by Ear, **not a request for the author to grade engineering test recordings**. Editorial approval of a published performance remains author-owned. See [Ear's real-worklet three-take witness](docs/evidence/2026-10-24-ear-three-take-selection.md). No CoreMIDI, vendor voice, private sound export or public release was added.
 
 ## Local build and acoustic test
 
