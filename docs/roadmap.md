@@ -42,6 +42,16 @@
 - [x] Compare the three private auditions using Ear's explicit source, analysis window, energy, spectral-onset and diagnostic-pitch measures. This is a verified **acoustic proxy**, not a claim to human perception.
 - [ ] Qualify Ear's phonetic-recognition detector independently from the synthesis source, with uncertainty, negative controls and confidence before setting a lyric-recognition acceptance criterion. Vendor fidelity and Marie Ork compatibility are **not** acceptance requirements.
 
+### S2b — speech-to-singing experimental source (24 October 2026)
+
+- [x] Build a **separate private offline** speech-derived resynthesizer against the same typed MIDI2 source and pinned, actually compiled midi2sampler DSP (`Experiments/SpeechToSing/`). Native procedural voice remains unchanged.
+- [x] Generate a macOS `say` **local control** (`la` / `me` / `na`) and run one source-SHA-verified 5.2-second four-note speech-derived PCM rehearsal in /tmp; document measured pitch proxies and local provenance. This is not an OpenAI voice.
+- [x] Add the supported OpenAI Realtime PCM capture **adapter and an offline, credential-free dry run**; do not claim any live OpenAI response while `OPENAI_API_KEY` is unavailable in the authorized shell.
+- [ ] Perform a rights-authorized, private OpenAI Realtime speech capture, and independently verify the actual source phonemes rather than accepting its model transcript or heuristic vowel boundaries as truth.
+- [x] Have Ear run an **actual source-verified browser worklet acoustic comparison** of locally-spoken sampled versus native articulated takes; all four target pitches have high diagnostic autocorrelation confidence after one source-grain phase coherence repair. This does not prove formants, listening or lyrics; [evidence](evidence/2026-10-24-speech-derived-melisma-and-ear.md).
+- [ ] Independently qualify formant/voice identity, human listening quality and phoneme recognition with independent positive/negative controls before claiming intelligible sung words.
+- [ ] Assess reusable, consented voice regions and formant preservation; no unapproved voice bank, media publication or training on API outputs.
+
 ## S3 — composer and Satzfunk (pending)
 
 - [ ] Implement self-describing instrument profile and author-selected voice.

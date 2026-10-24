@@ -39,6 +39,11 @@ public struct PhraseDocument: Decodable {
 public struct RenderedSound {
     public let sampleRate: Int
     public let samples: [Float]
+    /// Renderer-neutral PCM container, usable by separately authorized vocal engines.
+    public init(sampleRate: Int, samples: [Float]) {
+        self.sampleRate = sampleRate
+        self.samples = samples
+    }
     public var peak: Double { samples.reduce(0) { max($0, abs(Double($1))) } }
     public var rms: Double {
         guard !samples.isEmpty else { return 0 }

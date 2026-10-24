@@ -31,6 +31,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [24 October: extended native expressive audition and physical output witness](docs/evidence/expressive-singing-2026-10-24.md)
 - [24 October: three-take listening comparison and verified checksums](docs/evidence/three-take-comparison-2026-10-24.md)
 - [24 October: actual Ear worklet chooses the articulated development baseline](docs/evidence/2026-10-24-ear-three-take-selection.md)
+- [24 October: speech-to-singing private, source-verified experimental renderer](Experiments/SpeechToSing/README.md) and [independent Ear acceptance evidence](docs/evidence/2026-10-24-speech-derived-melisma-and-ear.md) — separate macOS 14+ package; sampled local spoken source, pinned midi2sampler DSP, same typed MIDI2 score, actual browser Ear diagnostic comparison; OpenAI capture adapter dry-run only
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
