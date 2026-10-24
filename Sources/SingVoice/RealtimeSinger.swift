@@ -27,9 +27,15 @@ private struct ThreeFormants {
     }
 }
 
+public enum SingArticulation: String, CaseIterable {
+    case plain
+    case articulated
+}
+
 private struct PhoneticColor {
     let consonant: ThreeFormants
     let vowel: ThreeFormants
+    let onset: UInt8 // l, m, n: local phoneme identity, not a MIDI message
 }
 
 private enum VoiceAction {
@@ -52,11 +58,13 @@ public struct RealtimePreparedPhrase {
     public let noteCount: Int
     public let eventCount: Int
     public let vibratoCents: Double
+    public let articulation: SingArticulation
     fileprivate let voices: [PhoneticColor]
     fileprivate let events: [VoiceEvent]
 
     public init(document: PhraseDocument, notes: [SingPerformanceNote],
-                sampleRate: Int = 48_000, vibratoCents: Double = 0) throws {
+                sampleRate: Int = 48_000, vibratoCents: Double = 0,
+                articulation: SingArticulation = .plain) throws {
         try ProceduralSinger.validate(document)
         guard vibratoCents.isFinite, (0.0...50.0).contains(vibratoCents) else {
             throw SingError.invalid("Vibrato depth must be 0...50 cents")
@@ -72,7 +80,8 @@ public struct RealtimePreparedPhrase {
         let voiceColors = document.phrase.syllables.map { syllable in
             PhoneticColor(
                 consonant: ThreeFormants(ProceduralSinger.formants(for: syllable.phonemes[0].symbol), sampleRate: rate),
-                vowel: ThreeFormants(ProceduralSinger.formants(for: syllable.phonemes[1].symbol), sampleRate: rate))
+                vowel: ThreeFormants(ProceduralSinger.formants(for: syllable.phonemes[1].symbol), sampleRate: rate),
+                onset: syllable.phonemes[0].symbol == "m" ? 1 : (syllable.phonemes[0].symbol == "n" ? 2 : 0))
         }
         var timeline: [VoiceEvent] = []
         timeline.reserveCapacity(notes.count * 3 + 16)
@@ -142,6 +151,7 @@ public struct RealtimePreparedPhrase {
         }
         self.sampleRate = sampleRate
         self.vibratoCents = vibratoCents
+        self.articulation = articulation
         self.frameCount = Int((Double(notes.last!.offMs + 400) * rate / 1000).rounded())
         self.noteCount = notes.count
         self.eventCount = timeline.count
@@ -185,6 +195,7 @@ public final class RealtimeSinger {
     private var noiseState: UInt32 = 0x1357_9BDF
     private var previousNoise = 0.0
     private var elapsedArticulation = 0
+    private var onsetType: UInt8 = 0
     private let onsetDelay: Int
     private let onsetTransition: Int
 
@@ -233,6 +244,7 @@ public final class RealtimeSinger {
         noiseState = 0x1357_9BDF
         previousNoise = 0
         elapsedArticulation = 0
+        onsetType = 0
         consonant = nil
         vowel = nil
         voice.phase = 0
@@ -245,6 +257,7 @@ public final class RealtimeSinger {
                 articulationsStarted += 1
                 consonant = prepared.voices[syllableIndex].consonant
                 vowel = prepared.voices[syllableIndex].vowel
+                onsetType = prepared.voices[syllableIndex].onset
                 elapsedArticulation = 0
                 envelope = 0
                 voice.phase = 0
@@ -299,10 +312,22 @@ public final class RealtimeSinger {
         voice.increment = instantaneous
         guard envelope > 0.00001, var onset = consonant, var sustain = vowel else { return 0 }
         let source = voice.sample()
-        let ratio = Double(elapsedArticulation - onsetDelay) / Double(onsetTransition)
+        let delay: Int
+        let transition: Int
+        if prepared.articulation == .articulated {
+            // Voiced bilabial /m/ and alveolar /n/ need longer closed resonant onsets.
+            delay = onsetType == 1 ? Int(Double(prepared.sampleRate) * 0.065) :
+                    (onsetType == 2 ? Int(Double(prepared.sampleRate) * 0.050) : onsetDelay)
+            transition = onsetType == 0 ? onsetTransition : Int(Double(prepared.sampleRate) * 0.070)
+        } else {
+            delay = onsetDelay
+            transition = onsetTransition
+        }
+        let ratio = Double(elapsedArticulation - delay) / Double(max(1, transition))
         let clipped = min(1, max(0, ratio))
         let mixed = clipped * clipped * (3 - 2 * clipped)
-        let signal = onset.filter(source) * (1 - mixed) * 0.65 + sustain.filter(source) * mixed
+        let onsetGain = prepared.articulation == .articulated ? 0.78 : 0.65
+        let signal = onset.filter(source) * (1 - mixed) * onsetGain + sustain.filter(source) * mixed
         // Deterministic non-voiced airflow component driven by standard MIDI2 Breath CC2.
         // Noise state is scalar and never allocates on the audio thread.
         var air = 0.0
@@ -312,6 +337,19 @@ public final class RealtimeSinger {
             noiseState ^= noiseState << 5
             let white = Double(noiseState & 0xffff) / 32767.5 - 1
             air = (white - previousNoise) * breathGain * 0.12
+            previousNoise = white
+        }
+        if prepared.articulation == .articulated && onsetType != 0 &&
+           elapsedArticulation >= delay && elapsedArticulation < delay + transition {
+            // A bounded, deterministic nasal-to-vowel release transient; never a
+            // synthetic fricative replacing the voiced /m/ or /n/ murmur.
+            let window = sin(Double.pi * clipped)
+            noiseState ^= noiseState << 13
+            noiseState ^= noiseState >> 17
+            noiseState ^= noiseState << 5
+            let white = Double(noiseState & 0xffff) / 32767.5 - 1
+            let transient = (white - previousNoise) * window
+            air += transient * (onsetType == 2 ? 0.035 : 0.015)
             previousNoise = white
         }
         consonant = onset

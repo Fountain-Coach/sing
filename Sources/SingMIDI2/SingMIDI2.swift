@@ -192,9 +192,11 @@ public enum SingMIDI2Score {
     /// Typed Universal MIDI Packets are decoded here; no Apple MIDI host or transport is involved.
     public static func prepareRealtime(_ document: PhraseDocument, events: [TimedSingPacket],
                                        sampleRate: Int = 48_000,
-                                       vibratoCents: Double = 0) throws -> RealtimePreparedPhrase {
+                                       vibratoCents: Double = 0,
+                                       articulation: SingArticulation = .plain) throws -> RealtimePreparedPhrase {
         try RealtimePreparedPhrase(document: document, notes: decode(document, events: events),
-                                   sampleRate: sampleRate, vibratoCents: vibratoCents)
+                                   sampleRate: sampleRate, vibratoCents: vibratoCents,
+                                   articulation: articulation)
     }
 
     /// This is an isolated offline PCM rehearsal, not a live MIDI endpoint or sound-card witness.

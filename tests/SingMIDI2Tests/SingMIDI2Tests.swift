@@ -296,6 +296,40 @@ final class SingMIDI2Tests: XCTestCase {
         XCTAssertThrowsError(try SingMIDI2Score.decode(doc, events: oversized))
     }
 
+    func testPlainArticulatedExpressiveSameScoreThreeDifferentPCM() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let input = try Data(contentsOf: root.appendingPathComponent("examples/sustained-melisma.json"))
+        let doc = try JSONDecoder().decode(PhraseDocument.self, from: input)
+        let base = try SingMIDI2Score.compile(doc)
+        let gesture = try SyntheticSingRehearsal.expressed(doc, startingFrom: base)
+        let plain = try SingMIDI2Score.prepareRealtime(doc, events: base)
+        let articulated = try SingMIDI2Score.prepareRealtime(
+            doc, events: base, articulation: .articulated)
+        let expressive = try SingMIDI2Score.prepareRealtime(
+            doc, events: gesture, vibratoCents: 24, articulation: .articulated)
+        let plainPCM = RealtimeSinger(prepared: plain).renderOffline(blockFrames: 37)
+        let articulatedPCM = RealtimeSinger(prepared: articulated).renderOffline(blockFrames: 251)
+        let expressivePCM = RealtimeSinger(prepared: expressive).renderOffline(blockFrames: 1024)
+        XCTAssertEqual(plainPCM.samples.count, 249_600)
+        XCTAssertEqual(articulatedPCM.samples.count, plainPCM.samples.count)
+        XCTAssertEqual(expressivePCM.samples.count, plainPCM.samples.count)
+        XCTAssertNotEqual(plainPCM.samples, articulatedPCM.samples)
+        XCTAssertNotEqual(articulatedPCM.samples, expressivePCM.samples)
+        XCTAssertGreaterThan(articulatedPCM.rms, 0.01)
+        XCTAssertGreaterThan(expressivePCM.rms, 0.01)
+        let repeated = RealtimeSinger(prepared: expressive).renderOffline(blockFrames: 47)
+        XCTAssertEqual(expressivePCM.samples, repeated.samples)
+        func onsetDifference(_ left: [Float], _ right: [Float], start: Int, end: Int) -> Double {
+            let values = (start..<end).map { Double(left[$0] - right[$0]) }
+            return sqrt(values.reduce(0.0) { $0 + $1 * $1 } / Double(values.count))
+        }
+        // Audition alteration must affect the phoneme onset, not just a file metadata flag.
+        XCTAssertGreaterThan(onsetDifference(plainPCM.samples, articulatedPCM.samples,
+                                             start: 48_000 * 2150 / 1000,
+                                             end: 48_000 * 2300 / 1000), 0.01)
+    }
+
     func testNoExternalTransportAndAuthenticPressurePacket() throws {
         let event = try SingMIDI2Score.notePressure(pitch: 65, atMilliseconds: 650, value: UInt32.max)
         let words = event.packet.words

@@ -1,6 +1,6 @@
 # Scenarios and acceptance — sing
 
-**Development status, 2026-10-24:** original portable Swift formant engine, typed MIDI 2.0 UMP parser and bounded PCM callback now implement channel Pitch Bend ±2 semitones, polyphonic pressure, MIDI 2.0 Breath Control CC2 and optional 5.3 Hz / 24-cent vibrato. The 5.2-second sustained-melisma example rendered 249,600 audio frames from 12 typed packets, was verified with hashes, and successfully completed through a separate macOS AVAudioEngine output host. **21 Swift tests and five Python phrase-contract tests passed locally. CoreMIDI was not used.** No human-intelligibility verdict, live external MIDI transport, hard-real-time deadline certification, analogue capture or publication is claimed. See [the 24 October acoustic witness](evidence/expressive-singing-2026-10-24.md).
+**Development status, 2026-10-24:** one 5.2-second native synthetic score now renders three distinct auditions—plain, articulated and expressive—using one portable Swift instrument. All three native Mac WAV files were independently reconstructed in the conversation container with **identical SHA-256 hashes**. The latest Mac regression passed **22 Swift tests and five Python phrase tests**. Real typed MIDI 2.0 packets provide note, pressure, ±2-semitone bend and breath control; the macOS PCM output host is separate and **CoreMIDI-free**. The 249,600-frame expressive output engine has been exercised, without a human listening verdict or analogue capture. See [the three-take acceptance witness](evidence/three-take-comparison-2026-10-24.md).
 
 ## S0 — source and capability inventory (done, documentary only)
 
@@ -17,6 +17,7 @@
 - [x] Test repeatability, measured sound, valid WAV, unknown phoneme rejection and no-note silence. Five Swift tests passed on macOS and Linux, separately from existing five Python authored-phrase tests.
 - [x] Produce 48 kHz mono 16-bit PCM WAV with recorded duration, level and SHA-256 digest (test fixture; no human audibility judgement).
 - [ ] Have the author identify intelligible `la mi na` by listening to native output; redesign formant and consonant transitions as required.
+- [x] Prepare three-way private comparison with identical score/duration, verified PCM hashes, actual /m/ and /n/ onset changes, and optional pitch/breath/vibrato. All three WAV digests match Mac-source renders; see [comparison evidence](evidence/three-take-comparison-2026-10-24.md).
 - [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
 - [x] Compile, decode and rehearse with the **existing** `Fountain-Coach/midi2` version 0.12.8 typed 64-bit Universal MIDI Packets (Note On, Note Off, 32-bit Polyphonic Pressure). Decoded pressure measurably changes the generated PCM; the path is **in-process/offline** and does not use CoreMIDI.
 - [x] Demonstrate bounded, prevalidated, sample-positioned event scheduling through a separate real macOS PCM output engine without CoreMIDI. Source frames consumed and engine start were witnessed, **not** acoustic loopback or under-load real-time guarantees.

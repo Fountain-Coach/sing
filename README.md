@@ -2,7 +2,7 @@
 
 **MIDI 2.0-native singing instruments for Fountain Coach.**
 
-**Status, 24 October 2026:** our original Swift singing instrument supports typed MIDI 2.0 Note On/Off, full-resolution polyphonic pressure, **32-bit channel pitch bend (±2 semitones), Breath Control CC2**, optional vibrato, and syllable-preserving melisma. A persistent 48 kHz PCM callback renders the voice independently of the event transport. A five-second synthetic score completed through the separate macOS AVAudioEngine output host (249,600 frames; 12 packets; three syllable articulations). **No CoreMIDI, no proprietary voicebank, no alternate MIDI plane.** Human intelligibility, physical MIDI transport, hard-real-time jitter and publication remain unverified.
+**Status, 24 October 2026:** the native Swift synthesizer now renders three independent, SHA-256-verified WAV takes from **one five-second synthetic score**: plain, articulated, and expressive. The articulation mode prolongs /m/ and /n/ nasal onsets and shapes their transition to vowels; the expressive mode adds typed MIDI 2.0 pitch bend and breath, plus optional vibrato. Four notes retain three syllable articulations across melisma. A separate macOS PCM output adapter works without CoreMIDI, and full authored WAV outputs were independently reproduced byte-for-byte outside the Mac. **No proprietary voice bank, no alternate MIDI plane.** Human listening, external MIDI transport, hard-real-time limits and publication remain separate pending gates.
 
 A voice is an instrument, a syllable is a timed phonetic state, and a performance is an executable score. **sing** makes text, phonemes, notes, expression, performer identity, and verifiable sound independently addressable. Our own glottal-excitation/formant synthesis is the implementation path. Alter/Ego and Wolfgang Palm's PPG Phonem remain **historical, black-box references only**; neither proprietary implementation is part of this source or required to build and render.
 
@@ -29,6 +29,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [23 October: typed MIDI 2.0 UMP rehearsal evidence](docs/evidence/ump-rehearsal-2026-10-23.md)
 - [23 October: real-time voice callback and macOS audio-output witness](docs/evidence/realtime-macos-output-2026-10-23.md)
 - [24 October: extended native expressive audition and physical output witness](docs/evidence/expressive-singing-2026-10-24.md)
+- [24 October: three-take listening comparison and verified checksums](docs/evidence/three-take-comparison-2026-10-24.md)
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
@@ -39,7 +40,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [Publishing, consent and rights](docs/rights-and-release.md)
 - [Provisional performance JSON schema](schemas/sing-phrase-v1.schema.json), [short synthetic phrase](examples/three-syllables.json), and [five-second sustained melisma](examples/sustained-melisma.json)
 
-**Current milestone:** typed MIDI 2.0 note, pressure, channel pitch-bend and breath-controller packets are decoded off the audio thread into sample-positioned events. A persistent synthesizer preserves formant centers independently from changing fundamental frequency, adds shaped airflow noise and 5.3 Hz optional vibrato, sustains the vowel across melisma and renders on a separately isolated macOS PCM output. **First intelligible-singing acceptance remains pending a human listening verdict** and callback measurements under load. Next: improve consonant/phonetic clarity, natural phrasing, independent continuous formant morphing, and a separately authorized non-CoreMIDI transport. No historical dramatic text, voice banks, passwords or audio exports belong in this public repository.
+**Current milestone:** the identical synthetic phrase now has **plain, articulated and expressive auditions**, distinguished by actual waveform differences and preserved by source/audio hashes. Typed MIDI 2.0 notes, pressure, pitch bend and breath are decoded off the audio thread; the independent native voice produces sustained vowels, a voiced nasal onset, optional vibrato and melisma without a CoreMIDI dependency. **First intelligible-singing acceptance remains pending a human listener's verdict** and callback measurements under load. Next: assess syllable clarity by listening, improve phonemes and natural phrasing, then test a separately authorized non-CoreMIDI transport. No historical text, voice banks, passwords or audio exports belong in public Git.
 
 ## Local build and acoustic test
 
@@ -50,10 +51,12 @@ swift run -c release sing-render examples/three-syllables.json /tmp/sing-control
 swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-ump.wav
 swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-pressure.wav --pressure
 swift run -c release sing-midi2-rehearsal examples/three-syllables.json /tmp/sing-realtime.wav --realtime
-swift run -c release sing-midi2-rehearsal examples/sustained-melisma.json /tmp/sing-sustained-expressive.wav --realtime --expressive --vibrato
+swift run -c release sing-midi2-rehearsal examples/sustained-melisma.json /tmp/sing-plain.wav --realtime
+swift run -c release sing-midi2-rehearsal examples/sustained-melisma.json /tmp/sing-articulated.wav --realtime --articulated
+swift run -c release sing-midi2-rehearsal examples/sustained-melisma.json /tmp/sing-expressive.wav --realtime --articulated --expressive --vibrato
 swift run sing-macos-output examples/three-syllables.json --probe
 # plays quietly on the machine's default output only when explicitly requested:
-swift run sing-macos-output examples/sustained-melisma.json --play --expressive --vibrato
+swift run sing-macos-output examples/sustained-melisma.json --play --articulated --expressive --vibrato
 python3 -m unittest discover -s tests -v
 python3 tools/check_phrase.py examples/three-syllables.json
 python3 tools/check_phrase.py examples/sustained-melisma.json

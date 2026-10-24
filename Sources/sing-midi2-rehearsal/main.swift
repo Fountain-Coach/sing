@@ -8,16 +8,17 @@ do {
     let args = Array(CommandLine.arguments.dropFirst())
     let flags = Array(args.dropFirst(2))
     guard args.count >= 2,
-          flags.allSatisfy({ ["--pressure", "--realtime", "--expressive", "--vibrato"].contains($0) }),
+          flags.allSatisfy({ ["--pressure", "--realtime", "--expressive", "--vibrato", "--articulated"].contains($0) }),
           Set(flags).count == flags.count else {
-        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure] [--realtime] [--expressive] [--vibrato]\n", stderr)
+        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure] [--realtime] [--articulated] [--expressive] [--vibrato]\n", stderr)
         exit(2)
     }
     let pressureRequested = flags.contains("--pressure")
     let realtimeRequested = flags.contains("--realtime")
     let expressiveRequested = flags.contains("--expressive")
     let vibratoRequested = flags.contains("--vibrato")
-    guard realtimeRequested || (!expressiveRequested && !vibratoRequested) else {
+    let articulatedRequested = flags.contains("--articulated")
+    guard realtimeRequested || (!expressiveRequested && !vibratoRequested && !articulatedRequested) else {
         fputs("--expressive and --vibrato require --realtime\n", stderr)
         exit(2)
     }
@@ -41,7 +42,8 @@ do {
     let pcm: RenderedSound
     if realtimeRequested {
         let plan = try SingMIDI2Score.prepareRealtime(
-            document, events: events, vibratoCents: vibratoRequested ? 24 : 0)
+            document, events: events, vibratoCents: vibratoRequested ? 24 : 0,
+            articulation: articulatedRequested ? .articulated : .plain)
         pcm = RealtimeSinger(prepared: plan).renderOffline(blockFrames: 128)
     } else {
         pcm = try SingMIDI2Score.rehearse(document, events: events)
@@ -56,6 +58,7 @@ do {
         "noteCount": document.performance.notes.count,
         "perNotePressure": pressureRequested,
         "expression": expressiveRequested,
+        "articulation": articulatedRequested ? "articulated" : "plain",
         "vibratoCents": vibratoRequested ? 24 : 0,
         "sampleAccurateRealtimeInnerLoop": realtimeRequested,
         "sampleRate": pcm.sampleRate,
