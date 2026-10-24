@@ -38,6 +38,53 @@ OpenAI. Three isolated syllables are recorded as one private SHA-identified
 speech corpus; the consonant-to-vowel split is an unverified heuristic.
 WAV and JSON evidence stay in /tmp and are never put in public Git.
 
+## Installed vowel-anchor comparison — private, not an accepted singer
+
+The previous standalone source-only prototype is now integrated as a reversible
+experiment in `scripts/vowel_anchor.py`. The local macOS source was tested
+against the *unchanged* score and native Swift + midi2sampler rehearsal.
+The Python implementation consumes the **same original phrase-score JSON**;
+the native Swift rehearsal separately compiles that score into typed MIDI 2.0
+Universal MIDI Packets. Python is **not** a new MIDI parser, transport, audio
+server or instrument, and it must not be represented as receiving UMP packets.
+
+The original Samantha local control fails its strict, original-pitch-to-note
+ratio rather than forcing a damaging transposition. A new, private macOS
+`Kathy` speech control (not OpenAI and not approved as a reusable voice)
+has a locally stable starting vowel pitch sufficiently close to the written
+four notes to allow a source-preserving PSOLA research render. It keeps
+original onset samples and preserves either a natural 70ms vowel release
+(default, with a disclosed 10ms fade) or the older, mostly silent
+`source-gap` release for an explicit negative comparison.
+
+Everything is installed and executable from the existing macOS Python:
+no external downloads, pip packages, platform or GitHub CI were added.
+The private research WAVs and receipts remain in `/tmp`, not Git.
+
+```sh
+python3 scripts/make_macos_say_fixture.py --voice Kathy --prefix /tmp/sing-vocal-Kathy
+python3 scripts/vowel_anchor.py \
+  --source /tmp/sing-vocal-Kathy.wav \
+  --source-manifest /tmp/sing-vocal-Kathy.json \
+  --score ../../examples/sustained-melisma.json \
+  --release-style natural-vowel \
+  --output /tmp/sing-vowel-anchor-kathy-release.wav \
+  --receipt /tmp/sing-vowel-anchor-kathy-release.json
+python3 -m unittest -q scripts/test_vowel_anchor.py
+```
+
+**Real Ear acceptance is mixed and explicitly fails phonetic/vocal goals.**
+The natural-vowel variant passes the *actual original Ear browser* acoustic
+activity and four-note pitch proxy (442 active windows against >430; 260.9,
+333.3, 389.8 and 333.3 Hz) without weakening Ear's threshold. However,
+Apple's separate SoundAnalysis sees zero vocal-positive windows out of nine
+(versus 2/2 on the spoken input), and independent Apple word recognition
+returns an empty transcript. It is still instrument-like rather than
+qualified singing. The older silent `source-gap` variant fails the
+original Ear active-window threshold (427) and is retained solely as
+reproducible negative evidence. Original articulated baseline stays untouched.
+See [source-addressed Ear evidence](../../docs/evidence/2026-10-24-vowel-anchor-kathy-ear.md).
+
 ## OpenAI audio source (opt-in, not demonstrated live)
 
 The current OpenAI Realtime API (October 2026) supports `gpt-realtime-2.1-mini`
