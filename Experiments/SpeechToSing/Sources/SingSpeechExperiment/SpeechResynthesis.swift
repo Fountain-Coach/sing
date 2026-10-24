@@ -24,6 +24,7 @@ public struct SpeechResynthesisReport: Encodable {
     public let coreMIDI: Bool
     public let sampleRate: Int
     public let frames: Int
+    public let naturalPreludeMilliseconds: Int
     public let rms: Double
     public let peak: Double
     public let phonemeRecognition: String
@@ -139,9 +140,13 @@ public enum PrivateSpeechSinger {
     public static func render(document: PhraseDocument,
                               performedNotes: [SingPerformanceNote],
                               speech: DecodedSpeechWav,
-                              manifest: SpeechSourceManifest)
+                              manifest: SpeechSourceManifest,
+                              naturalPreludeMilliseconds: Int = 0)
         throws -> (RenderedSound, SpeechResynthesisReport) {
         try ProceduralSinger.validate(document)
+        guard naturalPreludeMilliseconds == 0 || (50...320).contains(naturalPreludeMilliseconds) else {
+            throw SingError.invalid("Speech prelude must be original (0) or 50...320 milliseconds")
+        }
         let sr = speech.sampleRate
         guard manifest.schema == "sing.speech-source.v1",
               manifest.sampleRate == sr, sr == 48_000,
@@ -201,8 +206,21 @@ public enum PrivateSpeechSinger {
             guard marks.count >= 3 else {
                 throw SingError.invalid("No stable source pulse landmarks in \(region.syllableId)")
             }
+            // Keep the original, naturally articulated consonant-to-vowel
+            // gesture for a bounded prelude, including early vowel motion.
+            // After that, MIDI2 governs the prolonged/retuned vowel.
+            let sourceAvailable = region.vowelEndFrame - region.onsetStartFrame
             let nativeOnset = region.vowelStartFrame - region.onsetStartFrame
-            let onsetFrames = min(nativeOnset, sr / 5, max(sr / 100, length / 3))
+            let onsetFrames: Int
+            if naturalPreludeMilliseconds == 0 {
+                // Original S2 source articulation; preserve its committed
+                // PCM SHA when no experimental prelude is requested.
+                onsetFrames = min(nativeOnset, sr / 5, max(sr / 100, length / 3))
+            } else {
+                let desiredPrelude = naturalPreludeMilliseconds * sr / 1_000
+                onsetFrames = min(sourceAvailable - 1, desiredPrelude,
+                                  max(sr / 100, length / 3))
+            }
             let crossFrames = min(sr / 40, onsetFrames / 2)
             let vowelBegin = max(0, onsetFrames - crossFrames)
             var accumulated = [Float](repeating: 0, count: length)
@@ -289,7 +307,9 @@ public enum PrivateSpeechSinger {
             rendererStatus: "offline-resynthesis-not-perceptually-qualified",
             eventPlane: "Fountain-Coach/midi2 typed MIDI 2.0 UMP (in-process)",
             transport: "none", coreMIDI: false,
-            sampleRate: sr, frames: output.count, rms: sound.rms, peak: sound.peak,
+            sampleRate: sr, frames: output.count,
+            naturalPreludeMilliseconds: naturalPreludeMilliseconds,
+            rms: sound.rms, peak: sound.peak,
             phonemeRecognition: "not-performed",
             humanIntelligibility: "unverified",
             publicRelease: "not-admitted", syllables: findings

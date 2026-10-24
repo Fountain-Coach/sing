@@ -49,7 +49,9 @@
 - [x] Add the supported OpenAI Realtime PCM capture **adapter and an offline, credential-free dry run**; do not claim any live OpenAI response while `OPENAI_API_KEY` is unavailable in the authorized shell.
 - [ ] Perform a rights-authorized, private OpenAI Realtime speech capture, and independently verify the actual source phonemes rather than accepting its model transcript or heuristic vowel boundaries as truth.
 - [x] Have Ear run an **actual source-verified browser worklet acoustic comparison** of locally-spoken sampled versus native articulated takes; all four target pitches have high diagnostic autocorrelation confidence after one source-grain phase coherence repair. This does not prove formants, listening or lyrics; [evidence](evidence/2026-10-24-speech-derived-melisma-and-ear.md).
-- [ ] Independently qualify formant/voice identity, human listening quality and phoneme recognition with independent positive/negative controls before claiming intelligible sung words.
+- [x] Build/run Ear's *source-blind, on-device lexical diagnostic* with spoken reference, negative consonant/order, silence and noise controls: the source transcribed “La, me, nah.”, sampled singing “Love”, and original procedural singing nothing. Ear's private full test script executes the browser witness + transcript + envelope, and keeps singing marked **blocked**; [evidence](evidence/2026-10-24-speech-lexical-development-blocker.md).
+- [x] Experimentally preserve 140/230/300 ms of the original naturally spoken onset/vowel gesture, **opt-in only**; a 230-ms prelude changes whole-phrase transcript to “Me. Nah.”, still failing `la mi na`. Original default PCM preserved exactly by SHA-256.
+- [ ] Independently qualify formant trajectories/voice identity, human listening quality and actual phoneme recognition with a separately validated, held-out reference corpus before claiming intelligible sung words.
 - [ ] Assess reusable, consented voice regions and formant preservation; no unapproved voice bank, media publication or training on API outputs.
 
 ## S3 — composer and Satzfunk (pending)

@@ -26,6 +26,10 @@ swift test
 python3 scripts/make_macos_say_fixture.py --voice Samantha --prefix /tmp/sing-speech-macos
 swift run sing-speech-rehearsal ../../examples/sustained-melisma.json \
   /tmp/sing-speech-macos.wav /tmp/sing-speech-macos.json /tmp/sing-speech-hybrid.wav
+# Experimental longer natural consonant/vowel lead-in, not admitted as a singer:
+swift run sing-speech-rehearsal ../../examples/sustained-melisma.json \
+  /tmp/sing-speech-macos.wav /tmp/sing-speech-macos.json \
+  /tmp/sing-speech-prelude-230.wav --natural-prelude-ms 230
 python3 scripts/capture_openai_realtime.py --dry-run
 ```
 

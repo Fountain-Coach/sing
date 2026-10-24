@@ -101,6 +101,31 @@ final class SingSpeechExperimentTests: XCTestCase {
         XCTAssertEqual(again.samples, speechTake.samples)
     }
 
+    func testNaturalPreludeRequiresExplicitChangeAndRetainsOriginalDefault() throws {
+        let (document, notes) = try scoreAndNotes()
+        let (source, manifest) = fixture()
+        let (unchanged, defaultReceipt) = try PrivateSpeechSinger.render(
+            document: document, performedNotes: notes,
+            speech: source, manifest: manifest)
+        let (zero, _) = try PrivateSpeechSinger.render(
+            document: document, performedNotes: notes,
+            speech: source, manifest: manifest, naturalPreludeMilliseconds: 0)
+        let (extended, extendedReceipt) = try PrivateSpeechSinger.render(
+            document: document, performedNotes: notes,
+            speech: source, manifest: manifest, naturalPreludeMilliseconds: 230)
+        XCTAssertEqual(defaultReceipt.naturalPreludeMilliseconds, 0)
+        XCTAssertEqual(extendedReceipt.naturalPreludeMilliseconds, 230)
+        XCTAssertEqual(unchanged.samples, zero.samples)
+        XCTAssertNotEqual(unchanged.samples, extended.samples)
+        XCTAssertEqual(unchanged.samples.count, extended.samples.count)
+        XCTAssertEqual(extendedReceipt.syllables.map(\.outputOnsetCount), [1, 1, 1])
+        for invalid in [-1, 49, 321] {
+            XCTAssertThrowsError(try PrivateSpeechSinger.render(
+                document: document, performedNotes: notes,
+                speech: source, manifest: manifest, naturalPreludeMilliseconds: invalid))
+        }
+    }
+
     func testRejectsUnidentifiedSourceAndMissingPulse() throws {
         let (document, notes) = try scoreAndNotes()
         let (wav, _) = fixture()
