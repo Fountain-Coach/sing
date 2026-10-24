@@ -55,11 +55,45 @@ public enum SingMIDI2Score {
                                packet: UmpPacket64(word0: raw.word0, word1: raw.word1))
     }
 
+    /// Full-resolution MIDI 2.0 channel pitch bend, configured to +/-2 semitones.
+    /// Bend 0x80000000 means no bend; no CoreMIDI or MIDI 1.0 conversion.
+    public static func pitchBend(semitones: Double, atMilliseconds: Int) throws -> TimedSingPacket {
+        guard semitones.isFinite, (-2.0...2.0).contains(semitones), atMilliseconds >= 0 else {
+            throw SingMIDI2Error.invalid("Pitch bend outside 2-semitone instrument range")
+        }
+        let raw: UInt32
+        if semitones >= 0 {
+            let upper = Double(UInt32.max - 0x8000_0000)
+            raw = 0x8000_0000 + UInt32((upper * semitones / 2).rounded())
+        } else {
+            raw = 0x8000_0000 - UInt32((Double(0x8000_0000) * -semitones / 2).rounded())
+        }
+        let message = PitchBend(group: Uint4(0)!, channel: Uint4(0)!, value: raw)
+        let ump = message.ump()
+        return TimedSingPacket(atMilliseconds: atMilliseconds,
+                               packet: UmpPacket64(word0: ump.word0, word1: ump.word1))
+    }
+
+    /// MIDI 2.0 Control Change 2 (standard breath controller).
+    public static func breath(normalized: Double, atMilliseconds: Int) throws -> TimedSingPacket {
+        guard normalized.isFinite, (0.0...1.0).contains(normalized), atMilliseconds >= 0 else {
+            throw SingMIDI2Error.invalid("Breath controller value outside normalized range")
+        }
+        let raw = UInt32((Double(UInt32.max) * normalized).rounded())
+        let message = ControlChange(group: Uint4(0)!, channel: Uint4(0)!,
+                                    control: Uint7(2)!, value: raw)
+        let ump = message.ump()
+        return TimedSingPacket(atMilliseconds: atMilliseconds,
+                               packet: UmpPacket64(word0: ump.word0, word1: ump.word1))
+    }
+
     /// Decode UMP note lifecycle into independently authored phoneme assignments.
     /// Monophonic and one advancing note per syllable; silence and malformed sequences fail closed.
     public static func decode(_ document: PhraseDocument, events: [TimedSingPacket]) throws -> [SingPerformanceNote] {
         try ProceduralSinger.validate(document)
-        guard !events.isEmpty else { throw SingMIDI2Error.invalid("No MIDI 2.0 events") }
+        guard !events.isEmpty, events.count <= 16_384 else {
+            throw SingMIDI2Error.invalid("No MIDI 2.0 events or rehearsal packet capacity exceeded")
+        }
         struct Active {
             let id: String
             let syllableId: String
@@ -67,6 +101,8 @@ public enum SingMIDI2Score {
             let onMs: Int
             let velocity: Int
             var pressures: [SingPerformanceNote.PressurePoint] = []
+            var pitches: [SingPerformanceNote.PitchPoint] = []
+            var breaths: [SingPerformanceNote.BreathPoint] = []
         }
         var active: Active?
         var completed: [SingPerformanceNote] = []
@@ -109,16 +145,38 @@ public enum SingMIDI2Score {
                 }
                 completed.append(SingPerformanceNote(id: note.id, syllableId: note.syllableId,
                     pitch: note.pitch, onMs: note.onMs, offMs: timed.atMilliseconds,
-                    velocity16: note.velocity, pressurePoints: note.pressures))
+                    velocity16: note.velocity, pressurePoints: note.pressures,
+                    pitchPoints: note.pitches, breathPoints: note.breaths))
                 active = nil
             case 0xA:
-                guard let msg = PolyPressure(ump: raw), var note = active,
-                      Int(msg.noteNumber.rawValue) == note.pitch,
+                guard body.dataByte2 == 0, let msg = PolyPressure(ump: raw),
+                      var note = active, Int(msg.noteNumber.rawValue) == note.pitch,
                       timed.atMilliseconds <= Int.max - 1 else {
                     throw SingMIDI2Error.invalid("Pressure without the corresponding active note")
                 }
                 let normalized = Double(msg.pressure) / Double(UInt32.max)
                 note.pressures.append(.init(timeMs: timed.atMilliseconds, normalized: normalized))
+                active = note
+            case 0xE:
+                guard body.dataByte1 == 0, body.dataByte2 == 0,
+                      let bend = PitchBend(ump: raw), var note = active else {
+                    throw SingMIDI2Error.invalid("Pitch bend requires an active vocal note")
+                }
+                let semitones: Double
+                if bend.value >= 0x8000_0000 {
+                    semitones = 2 * Double(bend.value - 0x8000_0000) / Double(UInt32.max - 0x8000_0000)
+                } else {
+                    semitones = -2 * Double(0x8000_0000 - bend.value) / Double(0x8000_0000)
+                }
+                note.pitches.append(.init(timeMs: timed.atMilliseconds, semitones: semitones))
+                active = note
+            case 0xB:
+                guard body.dataByte2 == 0, let control = ControlChange(ump: raw),
+                      control.control.rawValue == 2, var note = active else {
+                    throw SingMIDI2Error.invalid("Only breath CC2 on an active vocal note is supported")
+                }
+                note.breaths.append(.init(timeMs: timed.atMilliseconds,
+                                          normalized: Double(control.value) / Double(UInt32.max)))
                 active = note
             default:
                 throw SingMIDI2Error.invalid("Unsupported MIDI 2.0 channel-voice event: \(body.status)")
@@ -133,9 +191,10 @@ public enum SingMIDI2Score {
     /// Prepare bounded sample-accurate events and all formant coefficients off the audio thread.
     /// Typed Universal MIDI Packets are decoded here; no Apple MIDI host or transport is involved.
     public static func prepareRealtime(_ document: PhraseDocument, events: [TimedSingPacket],
-                                       sampleRate: Int = 48_000) throws -> RealtimePreparedPhrase {
+                                       sampleRate: Int = 48_000,
+                                       vibratoCents: Double = 0) throws -> RealtimePreparedPhrase {
         try RealtimePreparedPhrase(document: document, notes: decode(document, events: events),
-                                   sampleRate: sampleRate)
+                                   sampleRate: sampleRate, vibratoCents: vibratoCents)
     }
 
     /// This is an isolated offline PCM rehearsal, not a live MIDI endpoint or sound-card witness.

@@ -10,10 +10,15 @@ import AudioToolbox
 // AVFoundation is used for PCM playback ONLY. It never opens a MIDI endpoint.
 do {
     let args = Array(CommandLine.arguments.dropFirst())
-    guard args.count == 2, ["--probe", "--play"].contains(args[1]) else {
-        fputs("usage: sing-macos-output phrase.json --probe | --play\n", stderr)
+    let flags = Array(args.dropFirst(2))
+    guard args.count >= 2, ["--probe", "--play"].contains(args[1]),
+          flags.allSatisfy({ ["--expressive", "--vibrato"].contains($0) }),
+          Set(flags).count == flags.count else {
+        fputs("usage: sing-macos-output phrase.json (--probe | --play) [--expressive] [--vibrato]\n", stderr)
         exit(2)
     }
+    let expressive = flags.contains("--expressive")
+    let vibrato = flags.contains("--vibrato")
     let phrase = try JSONDecoder().decode(PhraseDocument.self,
         from: Data(contentsOf: URL(fileURLWithPath: args[0])))
     let engine = AVAudioEngine()
@@ -27,8 +32,12 @@ do {
                                    interleaved: false) else {
         throw SingError.invalid("Could not construct planar stereo output format")
     }
-    let packets = try SingMIDI2Score.compile(phrase)
-    let plan = try SingMIDI2Score.prepareRealtime(phrase, events: packets, sampleRate: rate)
+    var packets = try SingMIDI2Score.compile(phrase)
+    if expressive {
+        packets = try SyntheticSingRehearsal.expressed(phrase, startingFrom: packets)
+    }
+    let plan = try SingMIDI2Score.prepareRealtime(
+        phrase, events: packets, sampleRate: rate, vibratoCents: vibrato ? 24 : 0)
     let instrument = RealtimeSinger(prepared: plan)
 
     if args[1] == "--play" {
@@ -65,6 +74,8 @@ do {
         "programmedFrames": plan.frameCount,
         "renderedFrames": instrument.framesRendered,
         "events": plan.eventCount,
+        "syntheticExpression": expressive,
+        "vibratoCents": vibrato ? 24 : 0,
         "articulationsStarted": instrument.articulationsStarted,
         "audioHeardByHuman": false,
         "audioCaptureVerified": false,

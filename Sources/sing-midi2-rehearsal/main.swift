@@ -7,13 +7,20 @@ import SingMIDI2
 do {
     let args = Array(CommandLine.arguments.dropFirst())
     let flags = Array(args.dropFirst(2))
-    guard args.count >= 2, flags.allSatisfy({ ["--pressure", "--realtime"].contains($0) }),
+    guard args.count >= 2,
+          flags.allSatisfy({ ["--pressure", "--realtime", "--expressive", "--vibrato"].contains($0) }),
           Set(flags).count == flags.count else {
-        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure] [--realtime]\n", stderr)
+        fputs("usage: sing-midi2-rehearsal phrase.json audition.wav [--pressure] [--realtime] [--expressive] [--vibrato]\n", stderr)
         exit(2)
     }
     let pressureRequested = flags.contains("--pressure")
     let realtimeRequested = flags.contains("--realtime")
+    let expressiveRequested = flags.contains("--expressive")
+    let vibratoRequested = flags.contains("--vibrato")
+    guard realtimeRequested || (!expressiveRequested && !vibratoRequested) else {
+        fputs("--expressive and --vibrato require --realtime\n", stderr)
+        exit(2)
+    }
     let document = try JSONDecoder().decode(PhraseDocument.self,
         from: Data(contentsOf: URL(fileURLWithPath: args[0])))
     var events = try SingMIDI2Score.compile(document)
@@ -28,9 +35,13 @@ do {
         events.append(pressure)
         events.sort { $0.atMilliseconds < $1.atMilliseconds }
     }
+    if expressiveRequested {
+        events = try SyntheticSingRehearsal.expressed(document, startingFrom: events)
+    }
     let pcm: RenderedSound
     if realtimeRequested {
-        let plan = try SingMIDI2Score.prepareRealtime(document, events: events)
+        let plan = try SingMIDI2Score.prepareRealtime(
+            document, events: events, vibratoCents: vibratoRequested ? 24 : 0)
         pcm = RealtimeSinger(prepared: plan).renderOffline(blockFrames: 128)
     } else {
         pcm = try SingMIDI2Score.rehearse(document, events: events)
@@ -44,6 +55,8 @@ do {
         "packetCount": events.count,
         "noteCount": document.performance.notes.count,
         "perNotePressure": pressureRequested,
+        "expression": expressiveRequested,
+        "vibratoCents": vibratoRequested ? 24 : 0,
         "sampleAccurateRealtimeInnerLoop": realtimeRequested,
         "sampleRate": pcm.sampleRate,
         "frames": pcm.samples.count,

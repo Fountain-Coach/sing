@@ -1,6 +1,6 @@
 # Scenarios and acceptance — sing
 
-**Development status, 2026-10-23:** original portable Swift formant engine, typed MIDI 2.0 UMP parser and bounded per-frame PCM callback have all built on Apple Silicon macOS. 15 Swift tests passed, and a separate AVAudioEngine adapter successfully started, processing all 90,240 scheduled frames on the default 48 kHz audio output with **no CoreMIDI**. Neither human-intelligible singing, live external MIDI transport, runtime memory/jitter guarantees, analogue capture nor public issue is established. See [native voice first](native-stack-decision-2026-10-23.md) and [real-time audio witness](evidence/realtime-macos-output-2026-10-23.md).
+**Development status, 2026-10-24:** original portable Swift formant engine, typed MIDI 2.0 UMP parser and bounded PCM callback now implement channel Pitch Bend ±2 semitones, polyphonic pressure, MIDI 2.0 Breath Control CC2 and optional 5.3 Hz / 24-cent vibrato. The 5.2-second sustained-melisma example rendered 249,600 audio frames from 12 typed packets, was verified with hashes, and successfully completed through a separate macOS AVAudioEngine output host. **21 Swift tests and five Python phrase-contract tests passed locally. CoreMIDI was not used.** No human-intelligibility verdict, live external MIDI transport, hard-real-time deadline certification, analogue capture or publication is claimed. See [the 24 October acoustic witness](evidence/expressive-singing-2026-10-24.md).
 
 ## S0 — source and capability inventory (done, documentary only)
 
@@ -19,7 +19,8 @@
 - [ ] Have the author identify intelligible `la mi na` by listening to native output; redesign formant and consonant transitions as required.
 - [ ] Store an immutable, typed render receipt with source revision and explicit human witness; generated PCM metrics are **not** a singing-quality verdict.
 - [x] Compile, decode and rehearse with the **existing** `Fountain-Coach/midi2` version 0.12.8 typed 64-bit Universal MIDI Packets (Note On, Note Off, 32-bit Polyphonic Pressure). Decoded pressure measurably changes the generated PCM; the path is **in-process/offline** and does not use CoreMIDI.
-- [ ] Admit a real-time, bounded event scheduling and audio-output path without CoreMIDI. No live UMP endpoint, on-wire transport, MIDI 2.0 device or sound-card witness has yet been demonstrated.
+- [x] Demonstrate bounded, prevalidated, sample-positioned event scheduling through a separate real macOS PCM output engine without CoreMIDI. Source frames consumed and engine start were witnessed, **not** acoustic loopback or under-load real-time guarantees.
+- [ ] Admit a real live MIDI 2.0 UMP endpoint or on-wire non-CoreMIDI transport; neither is currently demonstrated.
 - [x] Demonstrate monophonic vowel-preserving melisma across two note pitches (no retriggered consonant), reset/repeated PCM invariance, a 400 ms bounded release tail, and sample-identical output for varying buffer sizes.
 - [x] Run a separate macOS AVAudioEngine PCM adapter against the instrument callback. Output engine started and the voice processed all 90,240 scheduled frames at 48 kHz. No CoreMIDI.
 - [ ] Independently measure callback allocation behavior, worst-case latency, underruns and extended host stability; obtain an actual listening/loopback witness.
@@ -29,10 +30,13 @@
 
 - [ ] Build a small consented phoneme corpus and legally admitted rights receipts.
 - [x] Implement our **first independent procedural resonator prototype** with original excitation, per-phoneme formant banks and timed consonant-to-vowel crossfades; it currently covers only the original la/mi/na test phonemes, without proven naturalness.
-- [ ] Extend the prototype with independent continuous pitch/formant movement, tested vocal tract resonance and consonant transitions.
+- [x] Extend the voice with independent MIDI 2.0 continuous pitch bend that changes the fundamental without shifting the constant vowel-resonator centers; test measurable pitch ratio.
+- [ ] Implement author-controllable **formant movement**, better vocal-tract resonance and independently audible consonant transitions (not falsely inferred from the existing fixed onset-to-nucleus filter crossfade).
 - [ ] Reuse only actual exported `midi2sampler` code; add proper sample reader, buffer lifecycle and voice state.
-- [ ] Sustain vowel over variable pitch without unwanted formant shifts; consonant noise, airflow and release with click-free transitions.
-- [ ] Implement melisma, legato, silence/rest, repeated syllable with explicit advancement rules.
+- [x] Sustain a vowel across a four-note/three-syllable phrase with melisma and independent pitch motion; provide deterministic MIDI 2.0 Breath Control CC2 noise and bounded release with measured end-of-tail RMS.
+- [ ] Improve noisy/unvoiced consonants, vocal naturalness and verify click-free transitions by listening and more complete acoustic metrics.
+- [x] Implement and test explicit melisma that retains the vowel and does not restart consonant articulation on the second pitch.
+- [ ] Implement general ties/legato control, explicit rests, repeated-syllable advancement, phrase cursor management and pitch-continuous articulation beyond the current monophonic fixture.
 - [ ] Compare native auditions with author-selected acoustic/perceptual reference criteria; vendor fidelity and Marie Ork compatibility are **not** acceptance requirements.
 
 ## S3 — composer and Satzfunk (pending)

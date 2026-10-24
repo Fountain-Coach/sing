@@ -1,0 +1,52 @@
+{
+  "schema": "sing.phrase.v1",
+  "source": {
+    "sourceId": "sing.synthetic.sustained-la-mi-na.v1",
+    "kind": "synthetic",
+    "language": "en",
+    "text": "la mi na",
+    "rights": "original procedural phonetic test only, no voice samples"
+  },
+  "phrase": {
+    "id": "sustained-melisma-01",
+    "syllables": [
+      {
+        "id": "s1",
+        "text": "la",
+        "phonemes": [{"symbol": "l", "role": "onset"}, {"symbol": "ɑ", "role": "nucleus"}],
+        "stress": 0
+      },
+      {
+        "id": "s2",
+        "text": "mi",
+        "phonemes": [{"symbol": "m", "role": "onset"}, {"symbol": "i", "role": "nucleus"}],
+        "stress": 1
+      },
+      {
+        "id": "s3",
+        "text": "na",
+        "phonemes": [{"symbol": "n", "role": "onset"}, {"symbol": "ɑ", "role": "nucleus"}],
+        "stress": 0
+      }
+    ]
+  },
+  "performance": {
+    "timebase": "milliseconds",
+    "notes": [
+      {"id": "long-la-1", "syllableId": "s1", "pitch": 60,
+       "onMs": 0, "offMs": 1150, "velocity16": 35000, "advanceSyllable": true},
+      {"id": "long-la-2", "syllableId": "s1", "pitch": 64,
+       "onMs": 1150, "offMs": 2100, "velocity16": 34000, "advanceSyllable": false},
+      {"id": "long-mi", "syllableId": "s2", "pitch": 67,
+       "onMs": 2150, "offMs": 3300, "velocity16": 38000, "advanceSyllable": true},
+      {"id": "long-na", "syllableId": "s3", "pitch": 64,
+       "onMs": 3350, "offMs": 4800, "velocity16": 35000, "advanceSyllable": true}
+    ]
+  },
+  "voiceSelection": {"status": "unbound"},
+  "renderIntent": {
+    "state": "not-rendered",
+    "release": "not-admitted",
+    "preferredRenderer": "sing.original.procedural.formants.v0"
+  }
+}

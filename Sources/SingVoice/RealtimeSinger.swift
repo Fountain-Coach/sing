@@ -36,6 +36,8 @@ private enum VoiceAction {
     case noteOn(syllableIndex: Int, pitch: Int, phaseIncrement: Double, velocity: Double, advance: Bool)
     case noteOff(pitch: Int)
     case pressure(pitch: Int, normalized: Double)
+    case pitchBend(pitch: Int, multiplier: Double)
+    case breath(pitch: Int, normalized: Double)
 }
 
 private struct VoiceEvent {
@@ -49,11 +51,16 @@ public struct RealtimePreparedPhrase {
     public let frameCount: Int
     public let noteCount: Int
     public let eventCount: Int
+    public let vibratoCents: Double
     fileprivate let voices: [PhoneticColor]
     fileprivate let events: [VoiceEvent]
 
-    public init(document: PhraseDocument, notes: [SingPerformanceNote], sampleRate: Int = 48_000) throws {
+    public init(document: PhraseDocument, notes: [SingPerformanceNote],
+                sampleRate: Int = 48_000, vibratoCents: Double = 0) throws {
         try ProceduralSinger.validate(document)
+        guard vibratoCents.isFinite, (0.0...50.0).contains(vibratoCents) else {
+            throw SingError.invalid("Vibrato depth must be 0...50 cents")
+        }
         guard (16_000...192_000).contains(sampleRate) else {
             throw SingError.invalid("Unsupported real-time sample rate")
         }
@@ -93,8 +100,8 @@ public struct RealtimePreparedPhrase {
             timeline.append(VoiceEvent(frame: end, priority: 0, action: .noteOff(pitch: note.pitch)))
             var previousPressure = -1
             for point in note.pressurePoints {
-                guard point.timeMs >= note.onMs, point.timeMs <= note.offMs,
-                      point.timeMs >= previousPressure,
+                guard point.timeMs >= note.onMs, point.timeMs < note.offMs,
+                      point.timeMs > previousPressure,
                       point.normalized.isFinite, (0...1).contains(point.normalized) else {
                     throw SingError.invalid("Invalid timed polyphonic pressure")
                 }
@@ -103,12 +110,38 @@ public struct RealtimePreparedPhrase {
                                            action: .pressure(pitch: note.pitch, normalized: point.normalized)))
                 previousPressure = point.timeMs
             }
+            var lastPitchPoint = -1
+            for point in note.pitchPoints {
+                guard point.timeMs >= note.onMs, point.timeMs < note.offMs,
+                      point.timeMs > lastPitchPoint, point.semitones.isFinite,
+                      (-2.0...2.0).contains(point.semitones) else {
+                    throw SingError.invalid("Invalid per-note pitch bend timeline")
+                }
+                timeline.append(VoiceEvent(frame: Int((Double(point.timeMs) * rate / 1000).rounded()),
+                                           priority: 2, action: .pitchBend(
+                                            pitch: note.pitch,
+                                            multiplier: pow(2.0, point.semitones / 12.0))))
+                lastPitchPoint = point.timeMs
+            }
+            var lastBreathPoint = -1
+            for point in note.breathPoints {
+                guard point.timeMs >= note.onMs, point.timeMs < note.offMs,
+                      point.timeMs > lastBreathPoint, point.normalized.isFinite,
+                      (0.0...1.0).contains(point.normalized) else {
+                    throw SingError.invalid("Invalid per-note breath timeline")
+                }
+                timeline.append(VoiceEvent(frame: Int((Double(point.timeMs) * rate / 1000).rounded()),
+                                           priority: 2,
+                                           action: .breath(pitch: note.pitch, normalized: point.normalized)))
+                lastBreathPoint = point.timeMs
+            }
             previousOff = note.offMs
         }
         timeline.sort {
             $0.frame == $1.frame ? $0.priority < $1.priority : $0.frame < $1.frame
         }
         self.sampleRate = sampleRate
+        self.vibratoCents = vibratoCents
         self.frameCount = Int((Double(notes.last!.offMs + 400) * rate / 1000).rounded())
         self.noteCount = notes.count
         self.eventCount = timeline.count
@@ -126,6 +159,11 @@ public final class RealtimeSinger {
     private let releaseCoefficient: Double
     private let pressureCoefficient: Double
     private let pitchCoefficient: Double
+    private let breathCoefficient: Double
+    private let vibratoDepthRatio: Double
+    private let vibratoStep: Double
+    private let vibratoStartFrames: Int
+    private let vibratoRiseFrames: Int
     private var eventCursor = 0
     private var position = 0
     private var voice = Glottis(midiPitch: 60, sampleRate: 48_000)
@@ -139,6 +177,13 @@ public final class RealtimeSinger {
     private var targetPressure = 1.0
     private var pressureGain = 1.0
     private var pitchTarget = 0.0
+    private var smoothedIncrement = 0.0
+    private var baseIncrement = 0.0
+    private var breathTarget = 0.0
+    private var breathGain = 0.0
+    private var vibratoPhase = 0.0
+    private var noiseState: UInt32 = 0x1357_9BDF
+    private var previousNoise = 0.0
     private var elapsedArticulation = 0
     private let onsetDelay: Int
     private let onsetTransition: Int
@@ -146,6 +191,9 @@ public final class RealtimeSinger {
     public var framesRendered: Int { position }
     public var isFinished: Bool { position >= prepared.frameCount }
     public private(set) var articulationsStarted = 0
+    /// Diagnostics sampled outside the callback; pitch is tracked independently from vowel formants.
+    public var currentFundamentalHz: Double { voice.increment * Double(prepared.sampleRate) }
+    public var currentBreathLevel: Double { breathGain }
 
     public init(prepared: RealtimePreparedPhrase) {
         self.prepared = prepared
@@ -154,6 +202,11 @@ public final class RealtimeSinger {
         releaseCoefficient = 1 - exp(-1 / (0.065 * rate))
         pressureCoefficient = 1 - exp(-1 / (0.012 * rate))
         pitchCoefficient = 1 - exp(-1 / (0.018 * rate))
+        breathCoefficient = 1 - exp(-1 / (0.025 * rate))
+        vibratoDepthRatio = pow(2, prepared.vibratoCents / 1200) - 1
+        vibratoStep = 2 * Double.pi * 5.3 / rate
+        vibratoStartFrames = Int((0.18 * rate).rounded())
+        vibratoRiseFrames = max(1, Int((0.20 * rate).rounded()))
         onsetDelay = Int((0.022 * rate).rounded())
         onsetTransition = max(1, Int((0.09 * rate).rounded()))
         voice = Glottis(midiPitch: 60, sampleRate: rate)
@@ -171,6 +224,14 @@ public final class RealtimeSinger {
         velocity = 0
         targetPressure = 1
         pressureGain = 1
+        pitchTarget = 0
+        smoothedIncrement = 0
+        baseIncrement = 0
+        breathTarget = 0
+        breathGain = 0
+        vibratoPhase = 0
+        noiseState = 0x1357_9BDF
+        previousNoise = 0
         elapsedArticulation = 0
         consonant = nil
         vowel = nil
@@ -188,9 +249,14 @@ public final class RealtimeSinger {
                 envelope = 0
                 voice.phase = 0
                 voice.increment = increment
+                smoothedIncrement = increment
+                vibratoPhase = 0
+                breathTarget = 0
+                breathGain = 0
                 pressureGain = 1
                 targetPressure = 1
             }
+            baseIncrement = increment
             pitchTarget = increment
             velocity = 0.55 + 0.45 * nextVelocity
             pitch = nextPitch
@@ -200,6 +266,10 @@ public final class RealtimeSinger {
             if pitch == endingPitch { isGated = false }
         case .pressure(let notePitch, let normalized):
             if pitch == notePitch { targetPressure = 0.35 + 1.30 * normalized }
+        case .pitchBend(let notePitch, let multiplier):
+            if pitch == notePitch { pitchTarget = baseIncrement * multiplier }
+        case .breath(let notePitch, let normalized):
+            if pitch == notePitch { breathTarget = normalized }
         }
     }
 
@@ -216,17 +286,38 @@ public final class RealtimeSinger {
             envelope += (0 - envelope) * releaseCoefficient
         }
         pressureGain += (targetPressure - pressureGain) * pressureCoefficient
-        voice.increment += (pitchTarget - voice.increment) * pitchCoefficient
+        breathGain += (breathTarget - breathGain) * breathCoefficient
+        smoothedIncrement += (pitchTarget - smoothedIncrement) * pitchCoefficient
+        var instantaneous = smoothedIncrement
+        if vibratoDepthRatio > 0 && elapsedArticulation > vibratoStartFrames {
+            let elapsed = elapsedArticulation - vibratoStartFrames
+            let fade = min(1.0, Double(elapsed) / Double(vibratoRiseFrames))
+            instantaneous *= 1 + vibratoDepthRatio * fade * sin(vibratoPhase)
+        }
+        vibratoPhase += vibratoStep
+        if vibratoPhase >= 2 * Double.pi { vibratoPhase -= 2 * Double.pi }
+        voice.increment = instantaneous
         guard envelope > 0.00001, var onset = consonant, var sustain = vowel else { return 0 }
         let source = voice.sample()
         let ratio = Double(elapsedArticulation - onsetDelay) / Double(onsetTransition)
         let clipped = min(1, max(0, ratio))
         let mixed = clipped * clipped * (3 - 2 * clipped)
         let signal = onset.filter(source) * (1 - mixed) * 0.65 + sustain.filter(source) * mixed
+        // Deterministic non-voiced airflow component driven by standard MIDI2 Breath CC2.
+        // Noise state is scalar and never allocates on the audio thread.
+        var air = 0.0
+        if breathGain > 0.00001 {
+            noiseState ^= noiseState << 13
+            noiseState ^= noiseState >> 17
+            noiseState ^= noiseState << 5
+            let white = Double(noiseState & 0xffff) / 32767.5 - 1
+            air = (white - previousNoise) * breathGain * 0.12
+            previousNoise = white
+        }
         consonant = onset
         vowel = sustain
         elapsedArticulation += 1
-        return Float(signal * envelope * velocity * pressureGain * 0.8)
+        return Float((signal + air) * envelope * velocity * pressureGain * 0.8)
     }
 
     /// Hard real-time inner loop. The caller owns a preallocated Float buffer.

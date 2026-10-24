@@ -46,11 +46,29 @@ public struct RenderedSound {
     }
 }
 
-/// Transient performance data derived from timed instrument events.
- /// Syllable assignment remains in the authored phrase, never inside MIDI packets.
+/// Transient performance data derived from typed MIDI 2.0 packets.
+/// Authored syllable identity stays outside Universal MIDI Packets.
 public struct SingPerformanceNote {
     public struct PressurePoint {
         public let timeMs: Int
+        public let normalized: Double
+        public init(timeMs: Int, normalized: Double) {
+            self.timeMs = timeMs
+            self.normalized = normalized
+        }
+    }
+    public struct PitchPoint {
+        public let timeMs: Int
+        /// Channel pitch bend, instrument-configured to +/- two semitones.
+        public let semitones: Double
+        public init(timeMs: Int, semitones: Double) {
+            self.timeMs = timeMs
+            self.semitones = semitones
+        }
+    }
+    public struct BreathPoint {
+        public let timeMs: Int
+        /// MIDI 2.0 Control Change 2 (breath controller), normalized 0...1.
         public let normalized: Double
         public init(timeMs: Int, normalized: Double) {
             self.timeMs = timeMs
@@ -64,9 +82,12 @@ public struct SingPerformanceNote {
     public let offMs: Int
     public let velocity16: Int
     public let pressurePoints: [PressurePoint]
+    public let pitchPoints: [PitchPoint]
+    public let breathPoints: [BreathPoint]
 
     public init(id: String, syllableId: String, pitch: Int, onMs: Int,
-                offMs: Int, velocity16: Int, pressurePoints: [PressurePoint] = []) {
+                offMs: Int, velocity16: Int, pressurePoints: [PressurePoint] = [],
+                pitchPoints: [PitchPoint] = [], breathPoints: [BreathPoint] = []) {
         self.id = id
         self.syllableId = syllableId
         self.pitch = pitch
@@ -74,6 +95,8 @@ public struct SingPerformanceNote {
         self.offMs = offMs
         self.velocity16 = velocity16
         self.pressurePoints = pressurePoints
+        self.pitchPoints = pitchPoints
+        self.breathPoints = breathPoints
     }
 }
 

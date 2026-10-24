@@ -77,7 +77,9 @@ final class SingMIDI2Tests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let files = [
             "Sources/SingVoice/SingVoice.swift",
+            "Sources/SingVoice/RealtimeSinger.swift",
             "Sources/SingMIDI2/SingMIDI2.swift",
+            "Sources/SingMIDI2/SyntheticRehearsal.swift",
             "Sources/sing-midi2-rehearsal/main.swift",
             "Package.swift"
         ]
@@ -169,6 +171,129 @@ final class SingMIDI2Tests: XCTestCase {
                 abs(Double(sound.samples[frame]) - Double(sound.samples[frame - 1])))
         }
         XCTAssertLessThan(largestStep, 0.15)
+    }
+
+    func testMIDI2PitchAndBreathUseRealTypedPackets() throws {
+        let baseline = try SingMIDI2Score.compile(phrase())
+        let bend = try SingMIDI2Score.pitchBend(semitones: 1.25, atMilliseconds: 610)
+        let air = try SingMIDI2Score.breath(normalized: 0.65, atMilliseconds: 620)
+        XCTAssertEqual(Midi2ChannelVoiceBody(ump: bend.packet)?.status, 0xE)
+        XCTAssertEqual(Midi2ChannelVoiceBody(ump: air.packet)?.status, 0xB)
+        XCTAssertEqual(ControlChange(ump: Ump64(word0: air.packet.word0, word1: air.packet.word1)!)?.control.rawValue, 2)
+        var events = baseline + [bend, air]
+        events.sort { $0.atMilliseconds < $1.atMilliseconds }
+        let notes = try SingMIDI2Score.decode(phrase(), events: events)
+        XCTAssertEqual(notes[1].pitchPoints.count, 1)
+        XCTAssertEqual(notes[1].breathPoints.count, 1)
+        XCTAssertEqual(notes[1].pitchPoints[0].semitones, 1.25, accuracy: 0.00001)
+        XCTAssertEqual(notes[1].breathPoints[0].normalized, 0.65, accuracy: 0.00001)
+        XCTAssertThrowsError(try SingMIDI2Score.pitchBend(semitones: 2.01, atMilliseconds: 1))
+        XCTAssertThrowsError(try SingMIDI2Score.pitchBend(semitones: .nan, atMilliseconds: 1))
+        XCTAssertThrowsError(try SingMIDI2Score.breath(normalized: 1.01, atMilliseconds: 1))
+        XCTAssertThrowsError(try SingMIDI2Score.breath(normalized: .infinity, atMilliseconds: 1))
+        XCTAssertThrowsError(try SingMIDI2Score.breath(normalized: 0.1, atMilliseconds: -1))
+        let unsupported = ControlChange(group: Uint4(0)!, channel: Uint4(0)!,
+                                        control: Uint7(3)!, value: UInt32.max).ump()
+        events = baseline + [TimedSingPacket(atMilliseconds: 600,
+                       packet: UmpPacket64(word0: unsupported.word0, word1: unsupported.word1))]
+        events.sort { $0.atMilliseconds < $1.atMilliseconds }
+        XCTAssertThrowsError(try SingMIDI2Score.decode(phrase(), events: events))
+    }
+
+    func testBentPitchChangesFundamentalWithoutMovingFormantBanks() throws {
+        let doc = try phrase()
+        let raw = try SingMIDI2Score.compile(doc)
+        var bent = raw
+        bent.append(try SingMIDI2Score.pitchBend(semitones: 1.0, atMilliseconds: 600))
+        bent.sort { $0.atMilliseconds < $1.atMilliseconds }
+        let unchanged = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: raw))
+        let changed = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: bent))
+        var segment = [Float](repeating: 0, count: 48_000 * 810 / 1000)
+        segment.withUnsafeMutableBufferPointer { unchanged.render(into: $0) }
+        segment.withUnsafeMutableBufferPointer { changed.render(into: $0) }
+        let ratio = changed.currentFundamentalHz / unchanged.currentFundamentalHz
+        XCTAssertEqual(ratio, pow(2.0, 1.0 / 12.0), accuracy: 0.003)
+        XCTAssertEqual(unchanged.articulationsStarted, changed.articulationsStarted)
+    }
+
+    func testBreathIsDeterministicAndNotJustAnotherVolumeChange() throws {
+        let doc = try phrase()
+        let source = try SingMIDI2Score.compile(doc)
+        var breathy = source
+        breathy.append(try SingMIDI2Score.breath(normalized: 0.85, atMilliseconds: 600))
+        breathy.sort { $0.atMilliseconds < $1.atMilliseconds }
+        let plain = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: source))
+            .renderOffline(blockFrames: 33)
+        let first = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: breathy))
+            .renderOffline(blockFrames: 37)
+        let second = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: breathy))
+            .renderOffline(blockFrames: 511)
+        XCTAssertEqual(first.samples, second.samples)
+        let start = 48_000 * 700 / 1000
+        let end = 48_000 * 850 / 1000
+        var differenceSquared = 0.0
+        for i in start..<end {
+            let delta = Double(first.samples[i]) - Double(plain.samples[i])
+            differenceSquared += delta * delta
+        }
+        let differenceRMS = sqrt(differenceSquared / Double(end - start))
+        XCTAssertGreaterThan(differenceRMS, 0.005)
+        XCTAssertTrue(first.samples.allSatisfy(\.isFinite))
+    }
+
+    func testOptionalVibratoIsDeterministicAndIndependentOfPitchBend() throws {
+        let doc = try phrase()
+        var events = try SingMIDI2Score.compile(doc)
+        events.append(try SingMIDI2Score.pitchBend(semitones: -0.5, atMilliseconds: 600))
+        events.sort { $0.atMilliseconds < $1.atMilliseconds }
+        let flat = RealtimeSinger(prepared: try SingMIDI2Score.prepareRealtime(doc, events: events))
+            .renderOffline(blockFrames: 128)
+        let prepared = try SingMIDI2Score.prepareRealtime(doc, events: events, vibratoCents: 24)
+        let a = RealtimeSinger(prepared: prepared).renderOffline(blockFrames: 37)
+        let b = RealtimeSinger(prepared: prepared).renderOffline(blockFrames: 1024)
+        XCTAssertEqual(a.samples, b.samples)
+        XCTAssertNotEqual(a.samples, flat.samples)
+        XCTAssertThrowsError(try SingMIDI2Score.prepareRealtime(doc, events: events, vibratoCents: 51))
+    }
+
+    func testLongFourNoteMelismaScenarioWithBreathAndBend() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let input = try Data(contentsOf: root.appendingPathComponent("examples/sustained-melisma.json"))
+        let doc = try JSONDecoder().decode(PhraseDocument.self, from: input)
+        let base = try SingMIDI2Score.compile(doc)
+        let melisma = doc.performance.notes[1]
+        XCTAssertFalse(melisma.advanceSyllable)
+        let events = try SyntheticSingRehearsal.expressed(doc, startingFrom: base)
+        let plan = try SingMIDI2Score.prepareRealtime(doc, events: events, vibratoCents: 24)
+        XCTAssertEqual(plan.noteCount, 4)
+        XCTAssertEqual(plan.eventCount, 12)
+        let singer = RealtimeSinger(prepared: plan)
+        let pcm = singer.renderOffline(blockFrames: 97)
+        XCTAssertEqual(pcm.samples.count, 249_600)
+        XCTAssertEqual(singer.articulationsStarted, 3)
+        XCTAssertTrue(pcm.samples.allSatisfy(\.isFinite))
+        XCTAssertGreaterThan(pcm.rms, 0.01)
+        XCTAssertLessThan(pcm.peak, 0.95)
+    }
+
+    func testMalformedReservedMIDI2FieldsAndCapacityFailClosed() throws {
+        let doc = try phrase()
+        let base = try SingMIDI2Score.compile(doc)
+        let bend = try SingMIDI2Score.pitchBend(semitones: 1, atMilliseconds: 610)
+        let breath = try SingMIDI2Score.breath(normalized: 0.4, atMilliseconds: 620)
+        let pressure = try SingMIDI2Score.notePressure(pitch: 65,
+                                                       atMilliseconds: 630, value: UInt32.max / 2)
+        for message in [bend, breath, pressure] {
+            let corrupt = TimedSingPacket(atMilliseconds: message.atMilliseconds,
+                packet: UmpPacket64(word0: message.packet.word0 | 1,
+                                    word1: message.packet.word1))
+            var packets = base + [corrupt]
+            packets.sort { $0.atMilliseconds < $1.atMilliseconds }
+            XCTAssertThrowsError(try SingMIDI2Score.decode(doc, events: packets))
+        }
+        let oversized = Array(repeating: base[0], count: 16_385)
+        XCTAssertThrowsError(try SingMIDI2Score.decode(doc, events: oversized))
     }
 
     func testNoExternalTransportAndAuthenticPressurePacket() throws {
