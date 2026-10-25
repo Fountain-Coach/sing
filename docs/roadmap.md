@@ -54,6 +54,15 @@
 - [ ] Independently qualify formant trajectories/voice identity, human listening quality and actual phoneme recognition with a separately validated, held-out reference corpus before claiming intelligible sung words.
 - [ ] Assess reusable, consented voice regions and formant preservation; no unapproved voice bank, media publication or training on API outputs.
 
+## S2c — learn from teaching traditions (authored contract only; 25 October 2026)
+
+- [x] Research Italian classical, German lyric declamation, Spanish zarzuela, Hindustani vocal riyaz and tabla bol-recitation pedagogy without conflating traditions; [design](teaching-traditions-ear-sing-2026-10-25.md).
+- [x] Add five original text-only exercises, a separate versioned teaching-cycle schema and a local falsifiable validation suite. No teacher recording, recognizer, trained model or artistic authority claimed.
+- [ ] Ear first qualifies a language-compatible **Japanese** phoneme recognizer source-blind on held-out PJS labels; the present English phone inventory cannot do that.
+- [ ] Acquire rights-cleared, independently annotated teaching demonstrations from each actual target repertoire/dialect and verify source, singer independence and label authority.
+- [ ] Execute a true private demonstrate–imitate–listen–correct–repeat cycle; enforce frozen predeclared acoustic and phonetic criteria and separate held-out examination.
+- [ ] Integrate admitted goals with the existing Sing instrument state and MIDI 2.0 plane; avoid importing tabla bols as European sung phonemes.
+
 ## S3 — composer and Satzfunk (pending)
 
 - [ ] Implement self-describing instrument profile and author-selected voice.

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Fountain-Coach/sing/blob/main/schemas/sing-teaching-cycle-v1.schema.json",
+  "title": "sing.teaching-cycle.v1 — authored pedagogical exercises, never acoustic evidence",
+  "description": "Only design-time teaching prompts. No tutor execution, phoneme truth, consent, qualification or publication is represented.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "sessions"
+  ],
+  "properties": {
+    "schema": {
+      "const": "sing.teaching-cycle.v1"
+    },
+    "status": {
+      "const": "design-only"
+    },
+    "sessions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tradition",
+          "relation",
+          "languageTag",
+          "symbolSystem",
+          "material",
+          "focus",
+          "steps",
+          "authority",
+          "evaluation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tradition": {
+            "enum": [
+              "italian-bel-canto",
+              "german-lyric-declamation",
+              "spanish-zarzuela",
+              "north-indian-tabla",
+              "hindustani-vocal-riyaz"
+            ]
+          },
+          "relation": {
+            "enum": [
+              "direct-vocal-study",
+              "teaching-method-transfer"
+            ]
+          },
+          "languageTag": {
+            "enum": [
+              "it",
+              "de",
+              "es",
+              "und"
+            ]
+          },
+          "symbolSystem": {
+            "enum": [
+              "ipa-planned",
+              "tabla-bols",
+              "sargam"
+            ]
+          },
+          "material": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "text",
+              "rights"
+            ],
+            "properties": {
+              "kind": {
+                "const": "original-text-only"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rights": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "focus": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "teacher-demonstrate",
+                "listen-to-drone",
+                "echo-spoken",
+                "recite-on-pulse",
+                "recite-bols",
+                "clap-cycle",
+                "echo-sung",
+                "play-rhythm",
+                "contrast",
+                "correct",
+                "repeat",
+                "vary"
+              ]
+            }
+          },
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "teacherAudio",
+              "humanAnnotations",
+              "independentInference",
+              "singerQualification",
+              "publication"
+            ],
+            "properties": {
+              "teacherAudio": {
+                "const": "none"
+              },
+              "humanAnnotations": {
+                "const": "none"
+              },
+              "independentInference": {
+                "const": "not-run"
+              },
+              "singerQualification": {
+                "const": "blocked"
+              },
+              "publication": {
+                "const": "not-admitted"
+              }
+            }
+          },
+          "evaluation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope",
+              "inferenceLabelAccess",
+              "heldoutEvaluation"
+            ],
+            "properties": {
+              "scope": {
+                "const": "coaching-design-only"
+              },
+              "inferenceLabelAccess": {
+                "const": "forbidden"
+              },
+              "heldoutEvaluation": {
+                "const": "separate-repository-owner"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

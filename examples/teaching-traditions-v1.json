@@ -1,0 +1,205 @@
+{
+  "schema": "sing.teaching-cycle.v1",
+  "status": "design-only",
+  "sessions": [
+    {
+      "id": "it-bel-canto-geminate-v0",
+      "tradition": "italian-bel-canto",
+      "relation": "direct-vocal-study",
+      "languageTag": "it",
+      "symbolSystem": "ipa-planned",
+      "material": {
+        "kind": "original-text-only",
+        "text": "mamma",
+        "rights": "authored educational prompt only; no performer recording or voice grant"
+      },
+      "focus": [
+        "double-consonant",
+        "stable-vowel",
+        "legato",
+        "dynamic-arc"
+      ],
+      "steps": [
+        "teacher-demonstrate",
+        "echo-spoken",
+        "recite-on-pulse",
+        "echo-sung",
+        "contrast",
+        "correct",
+        "repeat",
+        "vary"
+      ],
+      "authority": {
+        "teacherAudio": "none",
+        "humanAnnotations": "none",
+        "independentInference": "not-run",
+        "singerQualification": "blocked",
+        "publication": "not-admitted"
+      },
+      "evaluation": {
+        "scope": "coaching-design-only",
+        "inferenceLabelAccess": "forbidden",
+        "heldoutEvaluation": "separate-repository-owner"
+      }
+    },
+    {
+      "id": "de-declamation-licht-v0",
+      "tradition": "german-lyric-declamation",
+      "relation": "direct-vocal-study",
+      "languageTag": "de",
+      "symbolSystem": "ipa-planned",
+      "material": {
+        "kind": "original-text-only",
+        "text": "Licht",
+        "rights": "authored educational prompt only; no performer recording or voice grant"
+      },
+      "focus": [
+        "consonant-cluster",
+        "vowel-length",
+        "spoken-sung-prosody"
+      ],
+      "steps": [
+        "teacher-demonstrate",
+        "echo-spoken",
+        "recite-on-pulse",
+        "echo-sung",
+        "contrast",
+        "correct",
+        "repeat"
+      ],
+      "authority": {
+        "teacherAudio": "none",
+        "humanAnnotations": "none",
+        "independentInference": "not-run",
+        "singerQualification": "blocked",
+        "publication": "not-admitted"
+      },
+      "evaluation": {
+        "scope": "coaching-design-only",
+        "inferenceLabelAccess": "forbidden",
+        "heldoutEvaluation": "separate-repository-owner"
+      }
+    },
+    {
+      "id": "es-zarzuela-dialogue-v0",
+      "tradition": "spanish-zarzuela",
+      "relation": "direct-vocal-study",
+      "languageTag": "es",
+      "symbolSystem": "ipa-planned",
+      "material": {
+        "kind": "original-text-only",
+        "text": "luna",
+        "rights": "authored educational prompt only; no performer recording or voice grant"
+      },
+      "focus": [
+        "lexical-stress",
+        "speech-to-song",
+        "vowel-clarity",
+        "dialect-to-be-specified"
+      ],
+      "steps": [
+        "teacher-demonstrate",
+        "echo-spoken",
+        "recite-on-pulse",
+        "echo-sung",
+        "contrast",
+        "correct",
+        "repeat",
+        "vary"
+      ],
+      "authority": {
+        "teacherAudio": "none",
+        "humanAnnotations": "none",
+        "independentInference": "not-run",
+        "singerQualification": "blocked",
+        "publication": "not-admitted"
+      },
+      "evaluation": {
+        "scope": "coaching-design-only",
+        "inferenceLabelAccess": "forbidden",
+        "heldoutEvaluation": "separate-repository-owner"
+      }
+    },
+    {
+      "id": "in-tabla-bol-recitation-v0",
+      "tradition": "north-indian-tabla",
+      "relation": "teaching-method-transfer",
+      "languageTag": "und",
+      "symbolSystem": "tabla-bols",
+      "material": {
+        "kind": "original-text-only",
+        "text": "dha dhin dhin dha",
+        "rights": "authored educational prompt only; no performer recording or voice grant"
+      },
+      "focus": [
+        "spoken-bol",
+        "pulse-position",
+        "call-and-response",
+        "cycle-awareness"
+      ],
+      "steps": [
+        "teacher-demonstrate",
+        "recite-bols",
+        "clap-cycle",
+        "echo-spoken",
+        "play-rhythm",
+        "contrast",
+        "correct",
+        "repeat",
+        "vary"
+      ],
+      "authority": {
+        "teacherAudio": "none",
+        "humanAnnotations": "none",
+        "independentInference": "not-run",
+        "singerQualification": "blocked",
+        "publication": "not-admitted"
+      },
+      "evaluation": {
+        "scope": "coaching-design-only",
+        "inferenceLabelAccess": "forbidden",
+        "heldoutEvaluation": "separate-repository-owner"
+      }
+    },
+    {
+      "id": "in-hindustani-vocal-riyaz-v0",
+      "tradition": "hindustani-vocal-riyaz",
+      "relation": "direct-vocal-study",
+      "languageTag": "und",
+      "symbolSystem": "sargam",
+      "material": {
+        "kind": "original-text-only",
+        "text": "Sa Re Ga",
+        "rights": "authored educational prompt only; no performer recording or voice grant"
+      },
+      "focus": [
+        "drone-relative-intonation",
+        "swar",
+        "call-and-response",
+        "ornament-planned"
+      ],
+      "steps": [
+        "teacher-demonstrate",
+        "listen-to-drone",
+        "echo-spoken",
+        "echo-sung",
+        "contrast",
+        "correct",
+        "repeat",
+        "vary"
+      ],
+      "authority": {
+        "teacherAudio": "none",
+        "humanAnnotations": "none",
+        "independentInference": "not-run",
+        "singerQualification": "blocked",
+        "publication": "not-admitted"
+      },
+      "evaluation": {
+        "scope": "coaching-design-only",
+        "inferenceLabelAccess": "forbidden",
+        "heldoutEvaluation": "separate-repository-owner"
+      }
+    }
+  ]
+}

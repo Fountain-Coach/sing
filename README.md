@@ -32,6 +32,7 @@ A source passage and its hash are not a voice bank. A voice bank and its licence
 - [24 October: three-take listening comparison and verified checksums](docs/evidence/three-take-comparison-2026-10-24.md)
 - [24 October: actual Ear worklet chooses the articulated development baseline](docs/evidence/2026-10-24-ear-three-take-selection.md)
 - [24 October: speech-to-singing private experimental renderer](Experiments/SpeechToSing/README.md), [Ear pitch evidence](docs/evidence/2026-10-24-speech-derived-melisma-and-ear.md), and [source-blind lexical gate/voice-envelope findings](docs/evidence/2026-10-24-speech-lexical-development-blocker.md) — MIDI2 notes verified, on-device recognizer does NOT recover all lyrics, no accepted naturalistic voice or OpenAI capture; source-only development.
+- [25 October: Ear/Sing teaching-tradition design (Italian, German, Spanish, tabla and Hindustani vocal study)](docs/teaching-traditions-ear-sing-2026-10-25.md) — text-only curriculum fixture, no trained tutor or qualified recognition.
 - [Architecture and instrument boundaries](docs/architecture.md)
 - [Code audit: Fountain Coach + Contexter](docs/source-audit-2026-10-21.md) and [immutable upstream Git pins](docs/audit-pins-2026-10-21.json)
 - [Alter/Ego compatibility reference](docs/alterego-reference.md)
