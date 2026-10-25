@@ -85,6 +85,60 @@ original Ear active-window threshold (427) and is retained solely as
 reproducible negative evidence. Original articulated baseline stays untouched.
 See [source-addressed Ear evidence](../../docs/evidence/2026-10-24-vowel-anchor-kathy-ear.md).
 
+## Time-varying vowel spectral experiment (WORLD, private only)
+
+The next source-preserving implementation is in
+`scripts/world_vocal_tract.py`, **separate from and reversible against**
+the existing Swift + midi2sampler instrument and the previous Python
+source-grain comparator. The single canonical score is still used, and
+only the sustained-vowel renderer is changed through the optional
+`vowel_renderer` research callback in `scripts/vowel_anchor.py`.
+The Python reference **does not receive typed UMP** and provides no new
+MIDI transport.
+
+It implements two source-matched conditions: **frozen** (same source
+spectral envelope every frame) and **evolving** (WORLD's time-varying source
+spectral envelope plus aperiodicity). Neither recognizes words or makes a
+public voice bank. Original source attacks, declared vowel releases and
+all four score pitch targets remain identical across conditions.
+
+The development workflow has installed and verified the exact WORLD
+research wheels on the **external DockerDisk**, not on the internal
+system drive. The self-contained maintenance installer is
+`scripts/setup_world_research.sh`; requirements and Python version are
+pinned by hashes in `requirements-world-macos-arm64.txt`. This lane is
+excluded from normal Swift package dependencies, GitHub CI and publication.
+No external model weights, protected voice samples or generated WAVs are
+copied into the owning Git repository.
+
+**Actual Ear result:** both conditions pass the unchanged original
+Chrome Ear AudioWorklet's acoustic activity and four-note pitch checks.
+Independent Apple word recognition hears **nothing** in the frozen
+condition but **"Love me."** in the evolving version. The *spoken*
+source itself is **"Love me, love."**, NOT an independently verified
+`la mi na` source. Neither WORLD condition passes Apple's separate
+voice-event classifier (0/9 vocal-positive windows), nor does Ear
+recognize the intended sung phonemes. The complete Ear owned regression
+preserves `lexical-gate-blocked`, unqualified all-phone output and
+failed held-out non-speech witness. Therefore evolving spectra are an
+evidence-supported **research direction**, NOT an accepted singer.
+Details: [25 October WORLD / Ear evidence](../../docs/evidence/2026-10-25-world-time-varying-vocal-spectrum-ear.md).
+
+Maintenance reproduction (handled by development, not by the studio author):
+
+```sh
+cd ~/Developer/sing
+sh Experiments/SpeechToSing/scripts/setup_world_research.sh
+WORLD=/Volumes/DockerDisk/fountain-coach/devtools/sing-world-venv/bin/python
+"$WORLD" Experiments/SpeechToSing/scripts/world_vocal_tract.py \
+  --source /tmp/sing-vocal-Kathy.wav \
+  --source-manifest /tmp/sing-vocal-Kathy.json \
+  --score examples/sustained-melisma.json \
+  --trajectory evolving \
+  --output /tmp/sing-world-kathy-evolving.wav \
+  --receipt /tmp/sing-world-kathy-evolving.json
+```
+
 ## OpenAI audio source (opt-in, not demonstrated live)
 
 The current OpenAI Realtime API (October 2026) supports `gpt-realtime-2.1-mini`

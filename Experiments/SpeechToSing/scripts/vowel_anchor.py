@@ -220,7 +220,8 @@ def source_regions(source_manifest,rate,total_frames,release_style="natural-vowe
     return regions
 
 
-def render(source,rate,source_sha,source_manifest,score,release_style="natural-vowel"):
+def render(source,rate,source_sha,source_manifest,score,release_style="natural-vowel",
+           vowel_renderer=None):
     if score.get("schema")!="sing.phrase.v1":
         raise CandidateError("Required existing Sing score schema")
     if (source_manifest.get("schema")!="sing.speech-source.v1"
@@ -284,7 +285,11 @@ def render(source,rate,source_sha,source_manifest,score,release_style="natural-v
             note_plan.append((min(vowel_frames,boundary),midi_hz(n["pitch"])))
         if any(b2<b1 for (b1,_),(b2,_) in zip(note_plan,note_plan[1:])):
             raise CandidateError("Nonmonotonic vowel note pitch plan")
-        vowel,stats=retime_vowel(source[a:b],rate,vowel_frames,note_plan)
+        # The native source/score/attack/release authority stays unchanged.
+        # A research vocoder may replace ONLY the sustained-vowel renderer;
+        # the original default remains byte-for-byte reproducible.
+        renderer = vowel_renderer if vowel_renderer is not None else retime_vowel
+        vowel,stats=renderer(source[a:b],rate,vowel_frames,note_plan)
         block=crossfade(crossfade(attack,vowel,overlap),coda,overlap)
         if len(block)!=length:
             raise CandidateError("Syllable frame count mismatch")

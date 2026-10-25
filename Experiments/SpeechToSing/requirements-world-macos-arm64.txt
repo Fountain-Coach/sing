@@ -1,0 +1,8 @@
+# Private Sing WORLD research only; CPython 3.14, macOS Apple Silicon.
+# Hashes are for official PyPI CPython 3.14 arm64 wheels, verified 2026-10-25.
+# Do not install this into production Sing or onto the constrained system disk.
+numpy==2.3.4 \
+    --hash=sha256:62b2198c438058a20b6704351b35a1d7db881812d8512d67a69c9de1f18ca05f \
+    --hash=sha256:7c26b0b2bf58009ed1f38a641f3db4be8d960a417ca96d14e5b06df1506d41ff
+pyworld-prebuilt==0.3.6.post1 \
+    --hash=sha256:e30aa681a3da7b6c5a38ceb7ec483b6c3fc3643ed40677ea40503307a7fe1bce
