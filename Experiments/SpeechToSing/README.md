@@ -139,6 +139,58 @@ WORLD=/Volumes/DockerDisk/fountain-coach/devtools/sing-world-venv/bin/python
   --receipt /tmp/sing-world-kathy-evolving.json
 ```
 
+## Source-blind spoken reference admission (research, blocked)
+
+The preferred next development gate is source quality **before** asking
+WORLD to make audible singing. An immutable, source-only and fully private
+speech cohort is constructed by
+`scripts/make_speech_reference_cohort.py`: five local macOS voice
+examples, fixed syllable spellings, explicit source activity requirement,
+source WAV and manifest hashes, and a plan frozen before independent
+speech recognition. **54** WAV filenames from **60** planned combinations
+produce only **eight distinct PCM recordings**: repeated spellings
+frequently result in identical audio. Ear is not told source wording
+during inference; the Sing evaluator
+`scripts/verify_spoken_reference.py` independently binds those results
+to the original SHA values and counts an identical audio source once.
+
+An exploratory subsequent macOS pitch-baseline control (reproduced by
+`scripts/make_provisional_pitch_source.py`) produces a provisional
+Karen spoken source with early vowel F0 around 343 / 358 / 358 Hz,
+compatible with all four original score notes under the unchanged
+0.67–1.90 pitch-ratio bounds. Apple recognizes **`La, me, na.`**
+and regards its source audio as speech. **But this is not independently
+annotated phoneme truth.** The local experimental lexical list and
+Ear's older canonical lexical aliases differ; Ear correctly blocks
+this input. No post-hoc alias change is permitted to make a result
+pass.
+
+Actual full Ear-owned source-blind evaluations of the *same new source*
+show a frozen WORLD candidate transcribed as **`La me, nah.`**,
+and evolving WORLD as **`La, me, no.`**. Both have actual browser
+acoustic count 445 and accurate four-note pitch proxies, but neither
+passes Ear's complete lexical and phoneme gate, and both fail native
+vocal evidence (0/9 and 2/9 vocal windows, respectively). This is
+important negative evidence: **source-dependent spectral evolution does
+not guarantee preservation of articulated syllables.**
+
+Existing native Swift + midi2sampler rendering stays unchanged; the
+source is not admitted for production, reusable voice assets, or public
+Satzfunk/First Hearing. No request to the author to install, audit
+recordings, or classify them. Full SHA-addressed report:
+[25 October spoken-source/Ear gate](../../docs/evidence/2026-10-25-spoken-source-blind-admission-ear.md).
+
+Local maintenance test, not a release procedure:
+
+```sh
+cd ~/Developer/sing
+python3 Experiments/SpeechToSing/scripts/make_speech_reference_cohort.py
+python3 Experiments/SpeechToSing/scripts/make_provisional_pitch_source.py
+python3 Experiments/SpeechToSing/scripts/verify_spoken_reference.py
+python3 -m unittest discover -s Experiments/SpeechToSing/scripts \
+  -p 'test_spoken_reference_gate.py' -q
+```
+
 ## OpenAI audio source (opt-in, not demonstrated live)
 
 The current OpenAI Realtime API (October 2026) supports `gpt-realtime-2.1-mini`
