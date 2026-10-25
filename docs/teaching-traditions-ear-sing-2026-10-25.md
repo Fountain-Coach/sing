@@ -29,7 +29,7 @@ PJS labels are in a case-sensitive Japanese inventory. Ear's English PocketSphin
 *Important distinction*: Opera languages are not interchangeable phoneme dictionaries. "Italian/German/Spanish opera" names multiple performing histories; zarzuela is not just "Spanish bel canto". Tabla bols are rhythmic/motor syllables, not an importable sung-phone inventory. Hindustani vocal/raga knowledge must not be reduced to tabla recitation or translated to Western operatic pitch/notation by default.
 
 ## First authored rehearsals, strictly no audio
-`examples/teaching-traditions-v1.json` records five authored *text-only* classroom exercises: Italian `mamma` (gemination and sustained vowel), German `Licht` (text/consonant), Spanish `luna` (accent and spoken-to-sung transition), an invented four-bol tabla teaching fragment (recitation/cycle; **not** a full theka), and abstract `Sa Re Ga` swara rehearsal (not a raga). No singer source, true transcription, timing, pitch measurement, consent grant or released audio is claimed. `schemas/sing-teaching-cycle-v1.schema.json` and `tools/check_teaching_cycle.py` provide *authored-data* integrity only.
+`examples/teaching-traditions-v1.json` records five authored *text-only* classroom exercises: Italian `mamma` (gemination and sustained vowel), German `Licht` (text/consonant), Spanish `luna` (accent and spoken-to-sung transition), a traditional short four-bol tabla vocabulary fragment (recitation/cycle; **not** a full theka), and abstract `Sa Re Ga` swara rehearsal (not a raga). No singer source, true transcription, timing, pitch measurement, consent grant or released audio is claimed. `schemas/sing-teaching-cycle-v1.schema.json` and `tools/check_teaching_cycle.py` provide *authored-data* integrity only.
 
 ## Protocol acceptance conditions
 - **Ear P0**: Japanese-model language inventory compatible with PJS; sealed original/revised human label manifest; no label or lyric enters inference; independent negative/near-phone controls and multi-singer heldout; publish error rates, timing distributions and abstentions; retain blocked status until actually passed.
@@ -39,14 +39,17 @@ PJS labels are in a case-sensitive Japanese inventory. Ear's English PocketSphin
 - **Release P4**: independent human experts may review diction or tradition suitability; teaching feedback is not permission to synthesize a known performer or release a recording. Only existing editorial/rights authorities can publish.
 
 ## Sources and scope
-- OPERA America, *Essential Skills and Training for Classical Singers* (2024): https://www.operaamerica.org/media/nhol4igk/essential-skills-and-training-for-classical-singers_rev0827.pdf
-- Kurt Adler, *Phonetics and Diction in Singing* (Italian, German, Spanish and French): https://www.upress.umn.edu/9780816604463/phonetics-and-diction-in-singing/
-- David Adams, *A Handbook of Diction for Singers*: https://academic.oup.com/book/44059
-- Escuela Superior de Canto de Madrid, lyric phonetic resources, including original Spanish conventions: https://escm.es/recursos-foneticos-musicales/
-- Teatro de la Zarzuela / INAEM, genre context: https://teatrodelazarzuela.inaem.gob.es/es/quienes-somos/genero
-- CBSE Hindustani percussion syllabus, recitation with hand beats: https://cbseacademic.nic.in/web_material/Curriculum16/Secondary/Secondary%20School%20Curriculum%20Vol%201.pdf
-- Tabla training progression (theka and solo repertoire): https://www.tablaglen.com/teaching
-- Dhrupad teaching ethnography, demonstration/emulation/gesture: https://www.mdpi.com/2227-7102/14/2/203
-- Real singer coaching: https://www.operaamerica.org/industry-resources/2025/oral-history-project/opera-america-onstage-an-oral-history-with-isabel-leonard/
+The following publicly accessible educational and musicological sources inform the **curriculum design**, not the phonetic truth of any audio, or an automatic artistic assessment.
 
-No library or web text is copied into a training corpus and no third-party audio has been obtained for these new lessons.
+- Vienna University of Music and Performing Arts, German song/opera diction, speech, breathing and text interpretation: https://www.mdw.ac.at/gesangundmusiktheater/lecturers-subject-areas/performing/
+- Vienna University of Music and Performing Arts, Italian/German singer-specific language teaching and musical interpretation: https://www.mdw.ac.at/gesangundmusiktheater/lecturers-subject-areas/applied-music-theory-languages-and-science/
+- Royal College of Music, vocal technique coupled with language and movement: https://www.rcm.ac.uk/courses/postgraduate/graddip/
+- OPERA America, staged development with technique, diction, acting and musicianship: https://www.operaamerica.org/membership-directory/18662/dolora-zajick-institute-for-young-dramatic-vo
+- Fundación Juan March, zarzuela alternates spoken text and sung/music passages; there is no single zarzuela model: https://www2.march.es/musica/jovenes/zarzuela/caracteristicas.asp
+- Eva Moreda Rodríguez (2022), singing and speaking in Spanish zarzuela performances of different timbral and diction styles: https://www.tandfonline.com/doi/abs/10.1080/01411896.2021.2021514
+- Stella Paschalidou (2024), embodied Dhrupad teaching, teacher demonstration, gestural imitation and repetition: https://www.mdpi.com/2227-7102/14/2/203
+- Columbia HAMR/ISMIR proceedings (2015), *Sawaal-Jawaab*: bols as mnemonic vocal syllables for tabla strokes and recited call-and-response: https://labrosa.ee.columbia.edu/hamr_ismir2015/proceedings/doku.php?id=sawaal-jawaab
+- Mahatma Gandhi Institute, *Tabla Extended Grade 7*, Chapter 7, padhant as spoken/counting bol practice accompanied by hand kriya (sam, khali): https://fliphtml5.com/ogvv/cmum/Tabla_Extended_Grade_7/
+- North Indian music pedagogy and the drone as an intonation reference: https://pmc.ncbi.nlm.nih.gov/articles/PMC12178062/
+
+A copied bol formula is an *example of traditional public musical vocabulary*, not a new authored melody or a cleared recording. No library or web text is copied into a training corpus and no third-party audio has been obtained for these new lessons.
