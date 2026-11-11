@@ -29,3 +29,11 @@
 **Source evidence authority:** `Sources/SingVoice/SingVocalTract.swift`, `tests/SingVoiceTests/SingVocalTractTests.swift`, `Sources/sing-tract-study/main.swift`, `examples/air-syllables.json`, both scored renderers and `tests/SingVoiceTests/SingFricativeTests.swift`. Actual exact files + flags in `docs/evidence/2026-11-11-continuous-tract-and-fricatives.md`.
 
 **Not yet achieved:** physiological parameter calibration from observed human recordings; anatomically accurate airflow; all IPA/dialects, natural singing and independent qualified phoneme recognition; proven physical playback; native browser AudioWorklet source parity; external MIDI2 transport; FCIS instrument admission/release; published lesson. This is a tested source-owned native candidate, not an admitted complete natural voice synthesis product. Do not use the rejected staged WIND-01 patch as a substitute.
+
+
+## 2026-11-11 · S3 independent acoustic audit and browser handoff
+
+**Goal:** investigate whether four original Sing WAVs form a fair, falsifiable listening baseline, *before* a claim of modeled human breath or a staged learner lesson.
+**Source and checks:** `tools/analyze_tract_audio.py` (independent stdlib WAV/FFT) + `tests/test_tract_acoustic_audit.py` (3 tests); original native Swift 33/33 unchanged; Python test suite **23/23 PASS** on Ubuntu. `docs/evidence/2026-11-11-tract-audit.json` checks native SHA with analysis details, source `2469cf3a`; SoX cross-checked WAV RMS windows.
+**Measured defect in uncontrolled A/B:** original narrow-breath is **10.06 dB** higher RMS than open-breath. Preserve original bytes; the private browser audition must apply a measured normalizing gain and disclose that RMS equality is not a loudness or realism certification. Independent voice output period proxy peaks at ~195.9 Hz, unvoiced sources have no similarly strong 80–300 Hz period.
+**Boundaries:** no real human reference/rights/measurement; source candidates remain unadmitted. Teatro Ear owns prose; Teatro Stage consumer may display these four byte-verified research WAVs but MUST label them finite recordings, not the native continuous engine. No second synthesis model, software deployment permissions or public audio release. Cross-repo consumer source and stage must carry separate exact attestations.

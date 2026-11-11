@@ -1,0 +1,65 @@
+{
+  "results": {
+    "breath-to-voice.wav": {
+      "durationSeconds": 7.0,
+      "file": "breath-to-voice.wav",
+      "frames": 336000,
+      "interpretation": "machine acoustic witness only; human breath realism not established",
+      "peakDbFS": -17.79,
+      "power3000to9000Over100to1000": 0.113,
+      "rmsDbFS": -31.75,
+      "sampleRateHz": 48000,
+      "sha256": "e0f17809b78d489dfe9383f62c5d60c43243a41939256442d1498d4604d77b0b",
+      "spectralCentroidHz": 1933.3,
+      "steady100msEnvelopeCV": 0.0396,
+      "voicingPeriodicityProxyAtHz": 285.7,
+      "voicingPeriodicityProxyMaxCorrelation": 0.0749
+    },
+    "narrow-breath.wav": {
+      "durationSeconds": 3.0,
+      "file": "narrow-breath.wav",
+      "frames": 144000,
+      "interpretation": "machine acoustic witness only; human breath realism not established",
+      "peakDbFS": -17.75,
+      "power3000to9000Over100to1000": 2.593,
+      "rmsDbFS": -27.37,
+      "sampleRateHz": 48000,
+      "sha256": "7c1e2073caa2f5bd8c62e7bae0e8e394f4163da7d3d361b5739a8941d1c0bde4",
+      "spectralCentroidHz": 8964.4,
+      "steady100msEnvelopeCV": 0.0125,
+      "voicingPeriodicityProxyAtHz": 265.2,
+      "voicingPeriodicityProxyMaxCorrelation": 0.0569
+    },
+    "open-breath.wav": {
+      "durationSeconds": 3.0,
+      "file": "open-breath.wav",
+      "frames": 144000,
+      "interpretation": "machine acoustic witness only; human breath realism not established",
+      "peakDbFS": -25.09,
+      "power3000to9000Over100to1000": 0.112,
+      "rmsDbFS": -37.43,
+      "sampleRateHz": 48000,
+      "sha256": "622a8f23547c393aa95ebf65c8731d0768d003c2bb5a4a568ad5d1cc1dc13a58",
+      "spectralCentroidHz": 1937.8,
+      "steady100msEnvelopeCV": 0.0369,
+      "voicingPeriodicityProxyAtHz": 285.7,
+      "voicingPeriodicityProxyMaxCorrelation": 0.0749
+    },
+    "phonation.wav": {
+      "durationSeconds": 3.0,
+      "file": "phonation.wav",
+      "frames": 144000,
+      "interpretation": "machine acoustic witness only; human breath realism not established",
+      "peakDbFS": -23.85,
+      "power3000to9000Over100to1000": 0.011,
+      "rmsDbFS": -34.85,
+      "sampleRateHz": 48000,
+      "sha256": "35bef2483a61ed7fc8c8fcb1bf5d12533b46dff265c5f1a4f95a6c291d4c0c5c",
+      "spectralCentroidHz": 782.9,
+      "steady100msEnvelopeCV": 0.0127,
+      "voicingPeriodicityProxyAtHz": 195.9,
+      "voicingPeriodicityProxyMaxCorrelation": 0.9741
+    }
+  },
+  "schema": "sing.tract.acoustic-audit.v1"
+}
