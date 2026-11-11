@@ -193,9 +193,9 @@ public enum ProceduralSinger {
         }
         for s in syllables {
             guard s.phonemes.count == 2, s.phonemes[0].role == "onset", s.phonemes[1].role == "nucleus",
-                  ["l", "m", "n"].contains(s.phonemes[0].symbol),
-                  ["ɑ", "i"].contains(s.phonemes[1].symbol) else {
-                throw SingError.invalid("Unsupported phonetic state in \(s.id); only l/m/n + ɑ/i is implemented")
+                  ["l", "m", "n", "f", "s", "h"].contains(s.phonemes[0].symbol),
+                  ["ɑ", "i", "u", "e", "o"].contains(s.phonemes[1].symbol) else {
+                throw SingError.invalid("Unsupported phonetic state in \(s.id); admitted l/m/n/f/s/h + ɑ/i/u/e/o only")
             }
         }
         guard !document.performance.notes.isEmpty else { throw SingError.invalid("No performance notes") }
@@ -237,6 +237,13 @@ public enum ProceduralSinger {
         case "l": return [Formant(frequency: 440, width: 180, gain: 0.7), Formant(frequency: 1200, width: 260, gain: 0.8), Formant(frequency: 2550, width: 350, gain: 0.5)]
         case "m": return [Formant(frequency: 280, width: 120, gain: 0.9), Formant(frequency: 1050, width: 220, gain: 0.22), Formant(frequency: 2300, width: 320, gain: 0.08)]
         case "n": return [Formant(frequency: 315, width: 130, gain: 0.9), Formant(frequency: 1480, width: 260, gain: 0.24), Formant(frequency: 2500, width: 300, gain: 0.08)]
+        // Filter targets for aperiodic constriction sources, not anatomically measured templates.
+        case "f": return [Formant(frequency: 980, width: 480, gain: 0.14), Formant(frequency: 2850, width: 780, gain: 0.3), Formant(frequency: 4800, width: 950, gain: 0.55)]
+        case "s": return [Formant(frequency: 1200, width: 500, gain: 0.10), Formant(frequency: 3500, width: 800, gain: 0.48), Formant(frequency: 5900, width: 1100, gain: 0.85)]
+        case "h": return [Formant(frequency: 730, width: 480, gain: 0.30), Formant(frequency: 1780, width: 650, gain: 0.40), Formant(frequency: 3200, width: 900, gain: 0.34)]
+        case "u": return [Formant(frequency: 335, width: 120, gain: 1), Formant(frequency: 950, width: 200, gain: 0.85), Formant(frequency: 2400, width: 360, gain: 0.34)]
+        case "e": return [Formant(frequency: 470, width: 130, gain: 1), Formant(frequency: 1950, width: 260, gain: 0.98), Formant(frequency: 2900, width: 380, gain: 0.45)]
+        case "o": return [Formant(frequency: 525, width: 155, gain: 1), Formant(frequency: 1040, width: 230, gain: 0.86), Formant(frequency: 2650, width: 390, gain: 0.35)]
         case "i": return [Formant(frequency: 290, width: 100, gain: 1), Formant(frequency: 2300, width: 260, gain: 1.2), Formant(frequency: 3150, width: 320, gain: 0.55)]
         default: return [Formant(frequency: 780, width: 185, gain: 1), Formant(frequency: 1200, width: 250, gain: 0.85), Formant(frequency: 2850, width: 380, gain: 0.5)] // ɑ
         }
@@ -290,6 +297,10 @@ public enum ProceduralSinger {
             var onset = VoiceBank(formants(for: syllable.phonemes[0].symbol), sampleRate: rate)
             var nucleus = VoiceBank(formants(for: syllable.phonemes[1].symbol), sampleRate: rate)
             var glottis = Glottis(midiPitch: note.pitch, sampleRate: rate)
+            let onsetPhoneme = syllable.phonemes[0].symbol
+            let isFricative = ["f", "s", "h"].contains(onsetPhoneme)
+            var noiseState: UInt32 = 0x4B6D_1C27 ^ UInt32(note.pitch)
+            var previousNoise = 0.0
             let onFrame = Int(round(Double(note.onMs) * rate / 1000))
             let offFrame = Int(round(Double(note.offMs) * rate / 1000))
             let endFrame = min(output.count, offFrame + Int(round(0.075 * rate)))
@@ -312,7 +323,20 @@ public enum ProceduralSinger {
                 let release = t <= duration ? 1 : 1 - shape((t - duration) / 0.070)
                 let onsetMix = 1 - shape((t - 0.025) / 0.095)
                 let source = glottis.sample()
-                let a = onset.sample(source)
+                let a: Double
+                if isFricative {
+                    noiseState ^= noiseState << 13
+                    noiseState ^= noiseState >> 17
+                    noiseState ^= noiseState << 5
+                    let white = Double(noiseState & 0xffff) / 32767.5 - 1
+                    let noisy = onsetPhoneme == "s" ? white - previousNoise :
+                                (onsetPhoneme == "f" ? white * 0.55 : white * 0.40)
+                    previousNoise = white
+                    a = onset.sample(noisy) * (onsetPhoneme == "s" ? 1.3 : 0.9) +
+                        noisy * (onsetPhoneme == "s" ? 0.08 : 0.02)
+                } else {
+                    a = onset.sample(source)
+                }
                 let b = nucleus.sample(source)
                 let gain = attack * release * (0.7 + 0.3 * velocity) * smoothedGain
                 let sample = gain * (a * onsetMix * 0.65 + b * (1 - onsetMix))

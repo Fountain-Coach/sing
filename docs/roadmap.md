@@ -81,3 +81,12 @@
 ## Test evidence table
 
 For each milestone, record: source and scenario hash; Git commits/revision of every used instrument; interpreter/host version and bank identity (metadata only); exact tool invocation; MIDI message receipts; captured isolated WAV checksum and audio properties; audible reviewer verdict; privacy/licensing and publication state. A mock, a file write, a UI launch or a non-silent system mix is **not** evidence of correctly articulated singing.
+
+
+## S3b — Continuous tract root for Teatro Ear (11 November 2026; native candidate implemented)
+
+**New implemented native subset:** `SingVocalTract` in the existing `SingVoice` library now provides continuous source-owned synthetic breath, narrowing and phonation. An explicit original `sing-tract-study` executable captures 3-second open/constricted/voiced samples plus a 7-second continuous breath-to-voice passage. These are finite *evidence files* from a potentially indefinite engine, not timed synth events. `RealtimeSinger` and the separate offline source/filter singer accept modeled `f/s/h` aperiodic onsets and `u/e/o` additional vowel resonances alongside historic `l/m/n + ɑ/i` without changing the existing MIDI 2.0 UMP plane.
+
+**Independent native proof:** Ubuntu Swift 6.3.3 full `swift test -j 4` PASS 33 tests; `swift run -c release sing-tract-study` PASS, four SHA-256-bound 48kHz WAV files. See [the actual execution ledger](evidence/2026-11-11-continuous-tract-and-fricatives.md). The earlier 22 Singer tests remain passing. These tests cover synthetic signal and deterministic controls, not physical human breath.
+
+**Completion gates still open:** actual measured human breath and vocal-tract/acoustics reference; source-blind Ear comparison and phoneme recognition; naturalistic singing / full phonetic inventory; qualified hard real-time under stress; source-identical browser/iPad interface; governed MIDI2 capability admission, portable released kit and author-approved recording/First Hearing. The source candidate is deliberately **not** advertised as a physiologically complete or published synthesizer. Preserve S3 existing work above, which concerns compositor/rights and remains unresolved.

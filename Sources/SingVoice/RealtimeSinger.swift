@@ -62,6 +62,17 @@ public struct RealtimePreparedPhrase {
     fileprivate let voices: [PhoneticColor]
     fileprivate let events: [VoiceEvent]
 
+    private static func onsetCode(for phoneme: String) -> UInt8 {
+        switch phoneme {
+        case "m": return 1
+        case "n": return 2
+        case "f": return 3
+        case "s": return 4
+        case "h": return 5
+        default: return 0
+        }
+    }
+
     public init(document: PhraseDocument, notes: [SingPerformanceNote],
                 sampleRate: Int = 48_000, vibratoCents: Double = 0,
                 articulation: SingArticulation = .plain) throws {
@@ -81,7 +92,7 @@ public struct RealtimePreparedPhrase {
             PhoneticColor(
                 consonant: ThreeFormants(ProceduralSinger.formants(for: syllable.phonemes[0].symbol), sampleRate: rate),
                 vowel: ThreeFormants(ProceduralSinger.formants(for: syllable.phonemes[1].symbol), sampleRate: rate),
-                onset: syllable.phonemes[0].symbol == "m" ? 1 : (syllable.phonemes[0].symbol == "n" ? 2 : 0))
+                onset: Self.onsetCode(for: syllable.phonemes[0].symbol))
         }
         var timeline: [VoiceEvent] = []
         timeline.reserveCapacity(notes.count * 3 + 16)
@@ -327,7 +338,24 @@ public final class RealtimeSinger {
         let clipped = min(1, max(0, ratio))
         let mixed = clipped * clipped * (3 - 2 * clipped)
         let onsetGain = prepared.articulation == .articulated ? 0.78 : 0.65
-        let signal = onset.filter(source) * (1 - mixed) * onsetGain + sustain.filter(source) * mixed
+        // A /f/, /s/ or /h/ onset has an aperiodic turbulent source; using the
+        // glottal oscillator here would incorrectly give a consonant a pitch.
+        // The same source-filter bank and authored syllable schedule remain intact.
+        let onsetSound: Double
+        if onsetType >= 3 {
+            noiseState ^= noiseState << 13
+            noiseState ^= noiseState >> 17
+            noiseState ^= noiseState << 5
+            let white = Double(noiseState & 0xffff) / 32767.5 - 1
+            let fricative = onsetType == 4 ? (white - previousNoise) :
+                            (onsetType == 3 ? white * 0.55 : white * 0.40)
+            previousNoise = white
+            let gain = onsetType == 4 ? 1.30 : (onsetType == 3 ? 0.90 : 0.60)
+            onsetSound = onset.filter(fricative) * gain + fricative * (onsetType == 4 ? 0.08 : 0.02)
+        } else {
+            onsetSound = onset.filter(source)
+        }
+        let signal = onsetSound * (1 - mixed) * onsetGain + sustain.filter(source) * mixed
         // Deterministic non-voiced airflow component driven by standard MIDI2 Breath CC2.
         // Noise state is scalar and never allocates on the audio thread.
         var air = 0.0
@@ -339,7 +367,7 @@ public final class RealtimeSinger {
             air = (white - previousNoise) * breathGain * 0.12
             previousNoise = white
         }
-        if prepared.articulation == .articulated && onsetType != 0 &&
+        if prepared.articulation == .articulated && (onsetType == 1 || onsetType == 2) &&
            elapsedArticulation >= delay && elapsedArticulation < delay + transition {
             // A bounded, deterministic nasal-to-vowel release transient; never a
             // synthetic fricative replacing the voiced /m/ or /n/ murmur.

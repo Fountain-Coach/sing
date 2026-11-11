@@ -9,7 +9,8 @@ let package = Package(
         .library(name: "SingMIDI2", targets: ["SingMIDI2"]),
         .executable(name: "sing-render", targets: ["SingRender"]),
         .executable(name: "sing-midi2-rehearsal", targets: ["SingMIDI2Rehearsal"]),
-        .executable(name: "sing-macos-output", targets: ["SingMacOSOutput"])
+        .executable(name: "sing-macos-output", targets: ["SingMacOSOutput"]),
+        .executable(name: "sing-tract-study", targets: ["SingTractStudy"])
     ],
     dependencies: [
         .package(url: "https://github.com/Fountain-Coach/midi2.git", exact: "0.12.8")
@@ -18,6 +19,7 @@ let package = Package(
         .target(name: "SingVoice", path: "Sources/SingVoice"),
         .target(name: "SingMIDI2", dependencies: ["SingVoice", .product(name: "MIDI2", package: "midi2")], path: "Sources/SingMIDI2"),
         .executableTarget(name: "SingRender", dependencies: ["SingVoice"], path: "Sources/sing-render"),
+        .executableTarget(name: "SingTractStudy", dependencies: ["SingVoice"], path: "Sources/sing-tract-study"),
         .executableTarget(name: "SingMIDI2Rehearsal", dependencies: ["SingMIDI2", "SingVoice"], path: "Sources/sing-midi2-rehearsal"),
         .executableTarget(
             name: "SingMacOSOutput",

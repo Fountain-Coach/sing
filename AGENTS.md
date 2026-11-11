@@ -4,7 +4,7 @@
 Design and verify independently reproducible MIDI 2.0 singing instruments interoperating with Satzfunk/Teatro. Implement our own native vocal synthesis first; neither Marie Ork nor Alter/Ego is on the critical path. Treat old vendor experiments and 7VST as protected historical research only. Build reusable, self-describing instruments; do not replace the manuscript/editorial workflow.
 
 ## Authority
-- **sing:** phoneme alignment, vowel sustains, consonant transitions, melisma, voice capabilities, acoustic controls, renderer contracts, tests and evidence receipts.
+- **sing:** phoneme alignment, vowel sustains, consonant transitions, melisma, voice capabilities, acoustic controls, renderer contracts, tests and evidence receipts. **SingVocalTract is the source-owned, continuous breath/constriction/phonation root for Teatro Ear**; neither Teatro Ear nor Csound Teatro may implement a competing physiological model and claim it is Sing. Synthetic preset values are hypotheses until compared with human acoustics; a native PCM test is not a WebAssembly or iPhone playback witness.
 - **Reframe:** source selection and editorial intent.
 - **Satzfunk:** private audition, take comparison, approvals and First Hearing release.
 - **Teatro/ScoreKit/AudioTalk:** score and expressive direction.

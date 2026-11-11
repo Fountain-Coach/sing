@@ -1,0 +1,31 @@
+# Sing — Development plan
+
+## 2026-11-11 · S3: Vocal-tract root instrument, grounded in breath
+
+**Writer goal:** Make Fountain-Coach/sing the source-owned root synthesizer for the Teatro Ear curriculum, beginning with observable open breath, constricted breath and the onset of phonation. Implement a genuinely playable, bounded, deterministic and continuous procedural voice *instrument* rather than improvising noise envelopes or inventing a second Csound voice model. A complete engineering candidate is distinct from a measured physiological simulator or perceptually proven natural singer.
+
+**Identity / source:** `Fountain-Coach/sing`, stable existing `SingVoice` + `SingMIDI2` and MIDI2 `0.12.8`, existing author-owned synthetic fixture. New `SingVocalTract` is a **local source/filter rendering capability within SingVoice**, not a new MIDI2 command namespace, MIDI-CI property, FCIS admission or public voice. An independent renderer may consume its PCM, but theatrical publication belongs to Teatro Ear/Press and no new delivery authority is introduced.
+
+**Phase A (implement and test):** A zero-allocation sample-level continuous vocal-tract model that separates airflow, turbulent constriction, periodic glottal excitation, resonant tract shape and output level; sample-accurate smoothing/controls, reproducible seeded noise, bounded numerical stability, explicit Stop/silence, and a finite **test/demo** render on top of continuous operation. Add a simple native offline CLI to generate exact open-breath/constricted-breath/phonation controls as original WAV fixtures; test spectral contrasts, silence, determinism, buffer invariance, no periodic compressor pumping and invalid-input rejection. Preserve existing SingVoice, RealtimeSinger, typed MIDI2 UMP paths and historic WAV hashes.
+
+**Phase B (integrate):** Reuse the same acoustic primitives in the existing scored real-time voice, or add an explicit source-owned route if waveform parity requires a separate adapter. Expand phonetic articulation for physically motivated /s/, /f/, /h/ and sustained vowels without pretending complete natural-language coverage. Test independent formant vs pitch, voiced/unvoiced transition and MIDI2 expression. Document any remaining incomplete IPA, recording, real-device audio callback, model-observation or rights gate.
+
+**Exact acceptance:** source compiles with committed SwiftPM graph; `swift test` all tests; new negative/spectral/continuous tests; multiple same-source PCM WAVs SHA-bound; a physical/output witness if available; no unapproved media in Git; all existing tests still pass; consumer can use one owned Sing render identity. No false claims of human intelligibility, measured airflow, live browser AudioWorklet integration, equipment support, release or public production from a test.
+
+**Governance read:** 07 (plan bounded work before edits, source and consumer discovery), 08 (distinct tests, acoustics, live audio and publisher receipts), 91/93 (existing instrument owner, versioned scenario/evidence; no promotion without separate admission), 151 (Csound Teatro is consumer performance/grammar, not a competing source of voice physiology).
+**What they forbid:** replacing core UMP or CoreMIDI bypass, forked voice synthesizer under Teatro, publishing an unapproved singer, claiming live interoperability or non-existent articulatory model validation.
+**Conflicts:** `sing` presently limits phonemes to /l,m,n + ɑ,i/ and renders finite authored scores; tutorial requires breath-first continuous sound and broader phonetics. Resolve in this owner without redefining existing MIDI2 packets or forcing the score to be infinite. Historic tests and source identities must survive.
+**Excluded:** trained neural voice, proprietary voice banks, on-device phoneme recognizer work in Ear, IPA-wide clinical speech synthesis, physical CFD, full real-time AudioUnit, new FCIS/IDL namespace, public narration/voice consent, staging until matching audio source is independently verified.
+
+**Next source task:** inspect existing SingVoice/RealtimeSinger and tests, then implement continuous breath/voiced tract renderer and run exact SwiftPM tests on authorized Ubuntu (Mac system disk is full).
+
+
+## S3 observed terminal tests — 2026-11-11
+
+**Native source / fixture:** Ubuntu Swift 6.3.3, x86_64 Linux, source copied into `~/Worktrees/sing-root-20261111`, independent of macOS system disk (which is near capacity). `swift test -j 4` passed **33/33, 0 failures**: original 17 SingMIDI2 tests, 5 SingVoice tests, 7 new SingVocalTract tests, 4 new fricative tests. Initial reset-parity failure was reproduced, fixed by restoring exactly the constructor's neutral filter-state transition; following rerun passed. Baseline MIDI2 and source-generated original PCM remain compatible.
+
+**Rendered audible artifacts (not heard by a human):** `swift run -c release sing-tract-study ~/Worktrees/sing-root-20261111-evidence` returned success, 48,000 Hz 16-bit mono, no proprietary samples. SHA-256: open breath `622a8f23547c393aa95ebf65c8731d0768d003c2bb5a4a568ad5d1cc1dc13a58`; constricted `7c1e2073caa2f5bd8c62e7bae0e8e394f4163da7d3d361b5739a8941d1c0bde4`; voiced `35bef2483a61ed7fc8c8fcb1bf5d12533b46dff265c5f1a4f95a6c291d4c0c5c`; continuous captured `e0f17809b78d489dfe9383f62c5d60c43243a41939256442d1498d4604d77b0b`. PCM peaks were ≤0.13. Original evidence retained privately on Ubuntu.
+
+**Source evidence authority:** `Sources/SingVoice/SingVocalTract.swift`, `tests/SingVoiceTests/SingVocalTractTests.swift`, `Sources/sing-tract-study/main.swift`, `examples/air-syllables.json`, both scored renderers and `tests/SingVoiceTests/SingFricativeTests.swift`. Actual exact files + flags in `docs/evidence/2026-11-11-continuous-tract-and-fricatives.md`.
+
+**Not yet achieved:** physiological parameter calibration from observed human recordings; anatomically accurate airflow; all IPA/dialects, natural singing and independent qualified phoneme recognition; proven physical playback; native browser AudioWorklet source parity; external MIDI2 transport; FCIS instrument admission/release; published lesson. This is a tested source-owned native candidate, not an admitted complete natural voice synthesis product. Do not use the rejected staged WIND-01 patch as a substitute.

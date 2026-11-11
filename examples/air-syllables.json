@@ -1,0 +1,100 @@
+{
+  "schema": "sing.phrase.v1",
+  "source": {
+    "sourceId": "sing.synthetic.sa-fu-ho.v1",
+    "kind": "synthetic",
+    "language": "en",
+    "text": "sa fu ho",
+    "rights": "original synthetic fricative vowel test, no captured performer"
+  },
+  "phrase": {
+    "id": "phrase-01",
+    "syllables": [
+      {
+        "id": "s1",
+        "text": "sa",
+        "phonemes": [
+          {
+            "symbol": "s",
+            "role": "onset"
+          },
+          {
+            "symbol": "ɑ",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 0
+      },
+      {
+        "id": "s2",
+        "text": "fu",
+        "phonemes": [
+          {
+            "symbol": "f",
+            "role": "onset"
+          },
+          {
+            "symbol": "u",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 1
+      },
+      {
+        "id": "s3",
+        "text": "ho",
+        "phonemes": [
+          {
+            "symbol": "h",
+            "role": "onset"
+          },
+          {
+            "symbol": "o",
+            "role": "nucleus"
+          }
+        ],
+        "stress": 0
+      }
+    ]
+  },
+  "performance": {
+    "timebase": "milliseconds",
+    "notes": [
+      {
+        "id": "n1",
+        "syllableId": "s1",
+        "pitch": 62,
+        "onMs": 0,
+        "offMs": 400,
+        "velocity16": 32000,
+        "advanceSyllable": true
+      },
+      {
+        "id": "n2",
+        "syllableId": "s2",
+        "pitch": 65,
+        "onMs": 440,
+        "offMs": 940,
+        "velocity16": 37000,
+        "advanceSyllable": true
+      },
+      {
+        "id": "n3",
+        "syllableId": "s3",
+        "pitch": 64,
+        "onMs": 980,
+        "offMs": 1480,
+        "velocity16": 31000,
+        "advanceSyllable": true
+      }
+    ]
+  },
+  "voiceSelection": {
+    "status": "unbound"
+  },
+  "renderIntent": {
+    "state": "not-rendered",
+    "release": "not-admitted",
+    "preferredRenderer": "sing.original.procedural.formants.v0"
+  }
+}
